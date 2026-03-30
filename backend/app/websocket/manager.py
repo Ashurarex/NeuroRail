@@ -1,3 +1,4 @@
+import asyncio
 from fastapi import WebSocket
 from typing import List
 
@@ -16,8 +17,12 @@ class ConnectionManager:
         print("Client disconnected")
 
     async def broadcast(self, message: dict):
-        for connection in self.active_connections:
-            await connection.send_json(message)
+        if not self.active_connections:
+            return
+        await asyncio.gather(
+            *(connection.send_json(message) for connection in self.active_connections),
+            return_exceptions=True,
+        )
 
 
 manager = ConnectionManager()

@@ -1,12 +1,14 @@
 from datetime import datetime, timedelta
-from jose import jwt, JWTError
+
 from fastapi import Depends, HTTPException
 from fastapi.security import HTTPBearer
-from sqlalchemy.orm import Session
+from jose import JWTError, jwt
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
-from app.db.database import get_db
-from app.db import models
+from app.database import get_db
+from app.models import User
 
 SECRET = settings.JWT_SECRET
 ALGORITHM = "HS256"
@@ -27,12 +29,16 @@ def create_token(data: dict):
 # -------------------------
 # 🔍 VERIFY TOKEN
 # -------------------------
-def verify_token(token=Depends(security), db: Session = Depends(get_db)):
+async def verify_token(token=Depends(security), db: AsyncSession = Depends(get_db)) -> User:
     try:
         payload = jwt.decode(token.credentials, SECRET, algorithms=[ALGORITHM])
         user_id = payload.get("user_id")
 
-        user = db.query(models.User).filter(models.User.id == user_id).first()
+        if not user_id:
+            raise HTTPException(status_code=401, detail="Invalid token")
+
+        result = await db.execute(select(User).where(User.id == user_id))
+        user = result.scalar_one_or_none()
 
         if not user:
             raise HTTPException(status_code=401, detail="User not found")
@@ -46,7 +52,7 @@ def verify_token(token=Depends(security), db: Session = Depends(get_db)):
 # -------------------------
 # 🛡️ ADMIN CHECK
 # -------------------------
-def verify_admin(user=Depends(verify_token)):
+async def verify_admin(user: User = Depends(verify_token)) -> User:
     if not user.is_admin:
         raise HTTPException(status_code=403, detail="Admin access required")
     return user

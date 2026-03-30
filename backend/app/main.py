@@ -1,36 +1,27 @@
-from fastapi import FastAPI, Depends
+from contextlib import asynccontextmanager
+
+from fastapi import Depends, FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 
-# 🔐 Auth
 from app.core.auth import verify_token
+from app.database import Base, engine
+from app import models
+from app.routes import alert_router, auth_router, detect_router, reports_router
+from app.websocket.manager import manager
 
-# 📦 Routers
-from app.routers.detect import router as detect_router
-from app.routers.alert import router as alert_router
-from app.routers.reports import router as reports_router  # ✅ NEW
 
-# 🗄️ DB
-from app.db.database import engine, Base
-from app.routers.auth import router as auth_router
+@asynccontextmanager
+async def lifespan(_: FastAPI):
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+    yield
 
 app = FastAPI(
     title="NeuroRail Backend",
     description="AI-powered Railway Surveillance & Safety Monitoring System",
     version="1.0.0",
+    lifespan=lifespan,
 )
-
-
-# -------------------------
-# 🚀 STARTUP: DB INIT
-# -------------------------
-@app.on_event("startup")
-def on_startup():
-    print("🚀 Starting NeuroRail backend...")
-
-    # Create tables if not exist
-    Base.metadata.create_all(bind=engine)
-
-    print("✅ Database connected & tables ready")
 
 
 # -------------------------
@@ -57,16 +48,27 @@ def root():
 # 🔐 PROTECTED TEST
 # -------------------------
 @app.get("/protected")
-def protected(user=Depends(verify_token)):
+async def protected(user=Depends(verify_token)):
     return {
         "message": "Protected route",
         "user": user
     }
 
 
+@app.websocket("/ws/alerts")
+async def alerts_websocket(websocket: WebSocket):
+    await manager.connect(websocket)
+    try:
+        while True:
+            await websocket.receive_text()
+    except WebSocketDisconnect:
+        manager.disconnect(websocket)
+
+
 # -------------------------
 # 📡 ROUTERS
 # -------------------------
+app.include_router(auth_router)
 app.include_router(detect_router)
 app.include_router(alert_router)
 app.include_router(reports_router)  # ✅ NEW (admin analytics)
@@ -83,7 +85,6 @@ def health():
         "features": [
             "alerts",
             "reports",
-            "websockets",
-            "supabase-storage"
+            "websockets"
         ]
     }
