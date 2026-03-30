@@ -25,7 +25,7 @@ export default function AdminSettingsPage() {
       title="Settings"
       subtitle="Configure system, alerts, camera setup, and role access."
     >
-      <article className="rail-panel p-5 min-h-[500px]">
+      <article className="rail-panel p-5">
         {!activeBlock ? (
           <>
             <h2 className="text-lg font-semibold">Configuration Blocks</h2>
