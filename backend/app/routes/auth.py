@@ -31,14 +31,15 @@ async def register(user: UserCreate, db: AsyncSession = Depends(get_db)) -> Toke
     new_user = User(
         email=user.email,
         password=hash_password(user.password),
-        is_admin=False,
+        is_admin=user.is_admin,
     )
     db.add(new_user)
     await db.commit()
     await db.refresh(new_user)
 
     token = create_token({"user_id": str(new_user.id), "is_admin": new_user.is_admin})
-    return TokenResponse(access_token=token)
+    role = "admin" if new_user.is_admin else "user"
+    return TokenResponse(access_token=token, role=role)
 
 
 @router.post("/login", response_model=TokenResponse)
@@ -49,5 +50,10 @@ async def login(user: UserLogin, db: AsyncSession = Depends(get_db)) -> TokenRes
     if not db_user or not verify_password(user.password, db_user.password):
         raise HTTPException(status_code=401, detail="Invalid credentials")
 
+    requested_role = user.role or ("admin" if db_user.is_admin else "user")
+    if requested_role == "admin" and not db_user.is_admin:
+        raise HTTPException(status_code=403, detail="Admin access required")
+
     token = create_token({"user_id": str(db_user.id), "is_admin": db_user.is_admin})
-    return TokenResponse(access_token=token)
+    role = "admin" if db_user.is_admin else "user"
+    return TokenResponse(access_token=token, role=role)

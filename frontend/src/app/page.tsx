@@ -1,14 +1,62 @@
+"use client";
+
+import Image from "next/image";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 export default function Home() {
+  const [showSplash, setShowSplash] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowSplash(false);
+    }, 1200);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (showSplash) {
+    return (
+      <main className="rail-gradient flex min-h-screen items-center justify-center">
+        <div className="rail-panel flex flex-col items-center gap-4 px-10 py-12">
+          <Image
+            src="/neurorail-logo.svg"
+            alt="NeuroRail logo"
+            width={72}
+            height={72}
+            className="h-18 w-18"
+          />
+          <div className="text-center">
+            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-muted">
+              NeuroRail
+            </p>
+            <h1 className="mt-2 text-2xl font-bold">Railway Safety Intelligence</h1>
+          </div>
+          <div className="h-1 w-24 overflow-hidden rounded-full bg-amber-100">
+            <div className="h-full w-1/2 animate-pulse rounded-full bg-accent" />
+          </div>
+        </div>
+      </main>
+    );
+  }
+
   return (
     <main className="rail-gradient flex min-h-screen items-center justify-center px-4 py-10">
       <section className="rail-panel stagger-in w-full max-w-5xl p-6 sm:p-10">
         <div className="grid gap-8 lg:grid-cols-[1.2fr_1fr]">
           <div className="space-y-6">
-            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-accent">
-              NeuroRail Command
-            </p>
+            <div className="flex items-center gap-3">
+              <Image
+                src="/neurorail-logo.svg"
+                alt="NeuroRail logo"
+                width={48}
+                height={48}
+                className="h-12 w-12"
+              />
+              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-accent">
+                NeuroRail
+              </p>
+            </div>
             <h1 className="text-4xl font-bold leading-tight sm:text-5xl">
               Railway Safety Intelligence, Tuned For Two Roles.
             </h1>

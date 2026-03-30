@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://127.0.0.1:8000";
 
 type ApiRequestOptions = RequestInit & {
   token?: string | null;
@@ -11,6 +11,26 @@ export class ApiError extends Error {
     public status: number,
   ) {
     super(message);
+  }
+}
+
+type ErrorPayload = {
+  detail?: string;
+  message?: string;
+  error?: string;
+};
+
+async function readErrorMessage(response: Response): Promise<string> {
+  const rawText = await response.text();
+  if (!rawText) {
+    return "Request failed";
+  }
+
+  try {
+    const data = JSON.parse(rawText) as ErrorPayload;
+    return data.detail || data.message || data.error || rawText;
+  } catch {
+    return rawText;
   }
 }
 
@@ -28,15 +48,25 @@ export async function apiRequest<T>(
     headers.set("Authorization", `Bearer ${options.token}`);
   }
 
-  const response = await fetch(`${API_BASE_URL}${path}`, {
-    ...options,
-    headers,
-  });
+  let response: Response;
+
+  try {
+    response = await fetch(`${API_BASE_URL}${path}`, {
+      ...options,
+      headers,
+    });
+  } catch {
+    throw new ApiError("Backend unreachable. Please ensure the API server is running.", 0);
+  }
 
   if (!response.ok) {
-    const message = await response.text();
-    throw new ApiError(message || "Request failed", response.status);
+    const message = await readErrorMessage(response);
+    throw new ApiError(message, response.status);
   }
 
   return (await response.json()) as T;
+}
+
+export async function pingBackend(): Promise<{ status?: string; service?: string }> {
+  return apiRequest("/health", { method: "GET" });
 }

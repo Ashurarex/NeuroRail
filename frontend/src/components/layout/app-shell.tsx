@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
@@ -50,9 +51,18 @@ export default function AppShell({ role, title, subtitle, children }: AppShellPr
     <main className="rail-gradient min-h-screen p-3 sm:p-5">
       <div className="mx-auto grid max-w-7xl gap-4 lg:grid-cols-[250px_1fr]">
         <aside className="rail-panel hidden p-4 lg:block">
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-accent">
-            {role === "admin" ? "Admin Console" : "User Console"}
-          </p>
+          <Link href="/" className="flex items-center gap-2">
+            <Image
+              src="/neurorail-logo.svg"
+              alt="NeuroRail logo"
+              width={32}
+              height={32}
+              className="h-8 w-8"
+            />
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-accent">
+              {role === "admin" ? "Admin Console" : "User Console"}
+            </p>
+          </Link>
           <nav className="mt-4 space-y-1">
             {navItems.map((item) => {
               const active = pathname === item.href;
@@ -60,9 +70,8 @@ export default function AppShell({ role, title, subtitle, children }: AppShellPr
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`block rounded-lg px-3 py-2 text-sm font-medium transition ${
-                    active ? "bg-accent text-white" : "hover:bg-amber-50"
-                  }`}
+                  className={`block rounded-lg px-3 py-2 text-sm font-medium transition ${active ? "bg-accent text-white" : "hover:bg-amber-50"
+                    }`}
                 >
                   {item.label}
                 </Link>
@@ -81,10 +90,21 @@ export default function AppShell({ role, title, subtitle, children }: AppShellPr
         <div className="space-y-4">
           <header className="rail-panel p-4">
             <div className="flex items-start justify-between gap-3">
-              <div>
-                <p className="text-xs uppercase tracking-[0.16em] text-muted">NeuroRail</p>
-                <h1 className="mt-1 text-2xl font-bold">{title}</h1>
-                <p className="mt-1 text-sm text-muted">{subtitle}</p>
+              <div className="flex items-start gap-3">
+                <Link href="/" className="shrink-0">
+                  <Image
+                    src="/neurorail-logo.svg"
+                    alt="NeuroRail logo"
+                    width={40}
+                    height={40}
+                    className="h-10 w-10"
+                  />
+                </Link>
+                <div>
+                  <p className="text-xs uppercase tracking-[0.16em] text-muted">NeuroRail</p>
+                  <h1 className="mt-1 text-2xl font-bold">{title}</h1>
+                  <p className="mt-1 text-sm text-muted">{subtitle}</p>
+                </div>
               </div>
               <button
                 type="button"
@@ -112,9 +132,8 @@ export default function AppShell({ role, title, subtitle, children }: AppShellPr
                       key={item.href}
                       href={item.href}
                       onClick={() => setOpen(false)}
-                      className={`rounded-lg px-3 py-2 text-sm font-medium ${
-                        active ? "bg-accent text-white" : "bg-amber-50"
-                      }`}
+                      className={`rounded-lg px-3 py-2 text-sm font-medium ${active ? "bg-accent text-white" : "bg-amber-50"
+                        }`}
                     >
                       {item.label}
                     </Link>

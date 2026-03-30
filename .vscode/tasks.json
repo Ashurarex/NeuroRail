@@ -1,0 +1,39 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Run backend (uvicorn)",
+			"type": "shell",
+			"command": ".\\venv\\Scripts\\python",
+			"args": [
+				"-m",
+				"uvicorn",
+				"app.main:app",
+				"--reload",
+				"--port",
+				"8000"
+			],
+			"options": {
+				"cwd": "c:/Users/Raghavendra/Desktop/NeuroRail v1/backend"
+			},
+			"isBackground": true,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "Run frontend (Next.js)",
+			"type": "shell",
+			"command": "npm",
+			"args": [
+				"run",
+				"dev"
+			],
+			"options": {
+				"cwd": "c:/Users/Raghavendra/Desktop/NeuroRail v1/frontend"
+			},
+			"isBackground": true,
+			"problemMatcher": [],
+			"group": "build"
+		}
+	]
+}

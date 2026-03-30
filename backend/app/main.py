@@ -6,7 +6,16 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.core.auth import verify_token
 from app.database import Base, engine
 from app import models
-from app.routes import alert_router, auth_router, detect_router, reports_router
+from app.routes import (
+    admin_router,
+    alert_router,
+    auth_router,
+    detect_router,
+    detections_router,
+    predictions_router,
+    reports_router,
+    users_router,
+)
 from app.websocket.manager import manager
 
 
@@ -72,6 +81,10 @@ app.include_router(auth_router)
 app.include_router(detect_router)
 app.include_router(alert_router)
 app.include_router(reports_router)  # ✅ NEW (admin analytics)
+app.include_router(admin_router)
+app.include_router(users_router)
+app.include_router(detections_router)
+app.include_router(predictions_router)
 
 
 # -------------------------

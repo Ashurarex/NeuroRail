@@ -1,0 +1,7 @@
+{
+    "name": "neurorail",
+    "private": true,
+    "scripts": {
+        "dev:all": "cmd /c .\\run-dev-all.cmd"
+    }
+}

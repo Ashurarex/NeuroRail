@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FormEvent, Suspense, useMemo, useState } from "react";
@@ -17,8 +18,12 @@ type FormState = {
 function SignUpPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [role, setRole] = useState<AppRole>(normalizeRole(searchParams.get("role")));
+  const role = useMemo<AppRole>(
+    () => normalizeRole(searchParams.get("role")),
+    [searchParams],
+  );
   const [pending, setPending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [form, setForm] = useState<FormState>({
     email: "",
     phone: "",
@@ -42,6 +47,7 @@ function SignUpPageContent() {
     }
 
     setPending(true);
+    setError(null);
     try {
       await signUp({
         email: form.email,
@@ -50,10 +56,14 @@ function SignUpPageContent() {
         role,
       });
       router.push(`/login?role=${role}`);
+    } catch (submitError) {
+      const message = submitError instanceof Error ? submitError.message : "Sign up failed.";
+      setError(message);
     } finally {
       setPending(false);
     }
   }
+
 
   function update<K extends keyof FormState>(key: K, value: FormState[K]) {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -69,21 +79,31 @@ function SignUpPageContent() {
           <p className="text-xs uppercase tracking-[0.15em] text-muted">Sign Up</p>
         </div>
 
-        <h1 className="text-3xl font-bold">Create Account</h1>
-        <p className="mt-2 text-sm text-muted">Register as a user or admin.</p>
+        <div className="flex items-center gap-3">
+          <Image
+            src="/neurorail-logo.svg"
+            alt="NeuroRail logo"
+            width={48}
+            height={48}
+            className="h-12 w-12"
+          />
+          <div>
+            <h1 className="text-3xl font-bold">Create Account</h1>
+            <p className="mt-2 text-sm text-muted">Register as a user or admin.</p>
+          </div>
+        </div>
 
         <form className="mt-6 space-y-4" onSubmit={onSubmit}>
+          {error ? (
+            <div className="rounded-xl border border-warning/40 bg-warning/10 px-4 py-3 text-sm text-warning">
+              {error}
+            </div>
+          ) : null}
           <div className="grid gap-2">
-            <label className="text-sm font-medium" htmlFor="role">Role</label>
-            <select
-              id="role"
-              value={role}
-              className="h-11 rounded-xl border border-line bg-surface px-3"
-              onChange={(event) => setRole(normalizeRole(event.target.value))}
-            >
-              <option value="user">User</option>
-              <option value="admin">Admin</option>
-            </select>
+            <label className="text-sm font-medium">Role</label>
+            <p className="rounded-xl border border-line bg-surface px-3 py-2 text-sm capitalize">
+              {role}
+            </p>
           </div>
 
           <div className="grid gap-2">
@@ -142,6 +162,7 @@ function SignUpPageContent() {
           >
             {pending ? "Creating account..." : "Sign up"}
           </button>
+
         </form>
 
         <p className="mt-5 text-center text-sm text-muted">

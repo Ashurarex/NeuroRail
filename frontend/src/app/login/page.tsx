@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FormEvent, Suspense, useMemo, useState } from "react";
@@ -11,13 +12,15 @@ function LoginPageContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const [role, setRole] = useState<AppRole>(
-    normalizeRole(searchParams.get("role")),
+  const role = useMemo<AppRole>(
+    () => normalizeRole(searchParams.get("role")),
+    [searchParams],
   );
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const [pending, setPending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const canSubmit = useMemo(
     () => isValidEmail(email) && isStrongPassword(password),
@@ -31,18 +34,23 @@ function LoginPageContent() {
     }
 
     setPending(true);
+    setError(null);
     try {
-      const response = await login({ email, password });
-      const resolvedRole = response.role === "admin" ? "admin" : role;
+      const response = await login({ email, password, role });
+      const resolvedRole = response.role === "admin" ? "admin" : "user";
       setAuthSession(response.access_token, resolvedRole, rememberMe);
 
       const next = searchParams.get("next");
       const destination = next || (resolvedRole === "admin" ? "/admin/dashboard" : "/user/home");
       router.push(destination);
+    } catch (submitError) {
+      const message = submitError instanceof Error ? submitError.message : "Login failed.";
+      setError(message);
     } finally {
       setPending(false);
     }
   }
+
 
   return (
     <main className="rail-gradient flex min-h-screen items-center justify-center p-4">
@@ -54,21 +62,31 @@ function LoginPageContent() {
           <p className="text-xs uppercase tracking-[0.15em] text-muted">Login</p>
         </div>
 
-        <h1 className="text-3xl font-bold">Secure Entry</h1>
-        <p className="mt-2 text-sm text-muted">Sign in to continue to NeuroRail.</p>
+        <div className="flex items-center gap-3">
+          <Image
+            src="/neurorail-logo.svg"
+            alt="NeuroRail logo"
+            width={48}
+            height={48}
+            className="h-12 w-12"
+          />
+          <div>
+            <h1 className="text-3xl font-bold">Secure Entry</h1>
+            <p className="mt-2 text-sm text-muted">Sign in to continue to NeuroRail.</p>
+          </div>
+        </div>
 
         <form className="mt-6 space-y-4" onSubmit={onSubmit}>
+          {error ? (
+            <div className="rounded-xl border border-warning/40 bg-warning/10 px-4 py-3 text-sm text-warning">
+              {error}
+            </div>
+          ) : null}
           <div className="grid gap-2">
-            <label className="text-sm font-medium" htmlFor="role">Role</label>
-            <select
-              id="role"
-              className="h-11 rounded-xl border border-line bg-surface px-3"
-              value={role}
-              onChange={(event) => setRole(normalizeRole(event.target.value))}
-            >
-              <option value="user">User</option>
-              <option value="admin">Admin</option>
-            </select>
+            <label className="text-sm font-medium">Role</label>
+            <p className="rounded-xl border border-line bg-surface px-3 py-2 text-sm capitalize">
+              {role}
+            </p>
           </div>
 
           <div className="grid gap-2">
