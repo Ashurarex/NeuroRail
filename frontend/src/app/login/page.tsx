@@ -36,7 +36,7 @@ function LoginPageContent() {
     setPending(true);
     setError(null);
     try {
-      const response = await login({ email, password, role });
+      const response = await login({ email, password });
       const resolvedRole = response.role === "admin" ? "admin" : "user";
       setAuthSession(response.access_token, resolvedRole, rememberMe);
 

@@ -25,9 +25,9 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${spaceGrotesk.variable} ${jetBrainsMono.variable} h-full antialiased`}
+      className={`${spaceGrotesk.variable} ${jetBrainsMono.variable} h-dvh antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="h-dvh overflow-hidden">{children}</body>
     </html>
   );
 }

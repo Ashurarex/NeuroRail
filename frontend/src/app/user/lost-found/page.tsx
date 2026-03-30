@@ -1,15 +1,77 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 import AppShell from "@/components/layout/app-shell";
-import { submitLostItemImage } from "@/lib/api/lost-found-service";
+import {
+  createLostFoundCase,
+  fetchMyLostFoundCases,
+} from "@/lib/api/lost-found-service";
+import type { LostFoundCase } from "@/lib/api/types";
 
 export default function UserLostFoundPage() {
-  const [status, setStatus] = useState("Ready");
   const [location, setLocation] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
+  const [cases, setCases] = useState<LostFoundCase[]>([]);
+  const [loadingCases, setLoadingCases] = useState(true);
+  const [search, setSearch] = useState("");
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  const filteredCases = useMemo(() => {
+    const term = search.trim().toLowerCase();
+    if (!term) {
+      return cases;
+    }
+    return cases.filter((item) => {
+      const locationValue = item.location?.toLowerCase() ?? "";
+      return item.id.toLowerCase().includes(term) || locationValue.includes(term);
+    });
+  }, [cases, search]);
+
+  const loadCases = async () => {
+    setLoadingCases(true);
+    setError(null);
+    try {
+      const rows = await fetchMyLostFoundCases();
+      setCases(rows);
+    } catch (loadError) {
+      const message =
+        loadError instanceof Error ? loadError.message : "Failed to load your cases.";
+      setError(message);
+      console.error("Failed to load cases:", loadError);
+    } finally {
+      setLoadingCases(false);
+    }
+  };
+
+  useEffect(() => {
+    void loadCases();
+  }, [refreshKey]);
+
+  // Auto-refresh when page becomes visible
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        void loadCases();
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, []);
+
+  // Auto-clear success notice after 4 seconds
+  useEffect(() => {
+    if (!notice) return;
+    const timeout = setTimeout(() => {
+      setNotice(null);
+    }, 4000);
+    return () => clearTimeout(timeout);
+  }, [notice]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -21,21 +83,31 @@ export default function UserLostFoundPage() {
 
     setPending(true);
     setError(null);
-    setStatus("Submitting request...");
+    setNotice(null);
 
     try {
-      const response = await submitLostItemImage(selectedFile);
+      const response = await createLostFoundCase(selectedFile, location);
       const locationSuffix = location.trim() ? ` at ${location.trim()}` : "";
-      setStatus(
-        `Submitted${locationSuffix}. Detection processed with alert ${response.alert.id}.`,
-      );
+      setNotice(`Submitted${locationSuffix}. Case ${response.id.slice(0, 8)} created.`);
+      setCases((prev) => [response, ...prev]);
+      setSelectedFile(null);
+      setLocation("");
+      // Clear file input display
+      const fileInput = document.getElementById("item-image") as HTMLInputElement;
+      if (fileInput) {
+        fileInput.value = "";
+      }
     } catch (submitError) {
       const message =
         submitError instanceof Error
           ? submitError.message
           : "Failed to submit the lost item request.";
+      console.error("Submit error details:", {
+        error: submitError,
+        message,
+        type: submitError instanceof Error ? submitError.constructor.name : typeof submitError,
+      });
       setError(message);
-      setStatus("Submission failed.");
     } finally {
       setPending(false);
     }
@@ -46,6 +118,9 @@ export default function UserLostFoundPage() {
       role="user"
       title="Lost & Found"
       subtitle="Upload item evidence and request AI-assisted matching."
+      searchValue={search}
+      onSearchChange={setSearch}
+      searchPlaceholder="Search your cases by ID or location"
     >
       <form onSubmit={handleSubmit} className="rail-panel grid gap-4 p-5">
         <div className="grid gap-2">
@@ -87,9 +162,80 @@ export default function UserLostFoundPage() {
           {pending ? "Submitting..." : "Submit Lost Item Request"}
         </button>
 
-        {error ? <p className="text-sm text-warning">Error: {error}</p> : null}
-        <p className="text-sm text-muted">Status: {status}</p>
+        {notice ? (
+          <div className="rounded-lg border border-emerald-400 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+            ✓ {notice}
+          </div>
+        ) : null}
+        {error ? (
+          <div className="rounded-lg border border-warning/40 bg-warning/10 px-4 py-3 text-sm text-warning">
+            {error}
+          </div>
+        ) : null}
       </form>
+
+      <article className="rail-panel p-5">
+        <div className="flex items-center justify-between gap-3">
+          <h2 className="text-lg font-semibold">My Cases</h2>
+          <button
+            type="button"
+            onClick={() => setRefreshKey((prev) => prev + 1)}
+            disabled={loadingCases}
+            className="rounded-lg border border-line px-3 py-2 text-xs font-semibold hover:bg-amber-50 disabled:opacity-50"
+          >
+            {loadingCases ? "Refreshing..." : "Refresh"}
+          </button>
+        </div>
+        {error && !loadingCases ? (
+          <div className="mt-3 rounded-lg border border-warning/40 bg-warning/10 px-4 py-3 text-sm text-warning">
+            {error}
+          </div>
+        ) : null}
+        <div className="mt-4 overflow-x-auto">
+          <table className="w-full text-left text-sm">
+            <thead>
+              <tr className="border-b border-line">
+                <th className="py-3 px-2 font-semibold text-muted">Case ID</th>
+                <th className="py-3 px-2 font-semibold text-muted">Location</th>
+                <th className="py-3 px-2 font-semibold text-muted">Status</th>
+                <th className="py-3 px-2 font-semibold text-muted">Submitted</th>
+              </tr>
+            </thead>
+            <tbody>
+              {loadingCases ? (
+                <tr>
+                  <td className="py-4 px-2 text-muted" colSpan={4}>
+                    Loading cases...
+                  </td>
+                </tr>
+              ) : null}
+              {!loadingCases && filteredCases.length === 0 ? (
+                <tr>
+                  <td className="py-4 px-2 text-muted" colSpan={4}>
+                    No cases found.
+                  </td>
+                </tr>
+              ) : null}
+              {!loadingCases
+                ? filteredCases.map((item) => (
+                  <tr key={item.id} className="border-b border-line/50 hover:bg-amber-50/30 transition">
+                    <td className="py-3 px-2 font-mono text-xs">{item.id.slice(0, 12)}...</td>
+                    <td className="py-3 px-2">{item.location ?? "-"}</td>
+                    <td className="py-3 px-2">
+                      <span className="inline-block rounded-full px-2 py-1 text-xs font-semibold bg-amber-100 text-amber-700 capitalize">
+                        {item.status}
+                      </span>
+                    </td>
+                    <td className="py-3 px-2 text-xs">
+                      {new Date(item.created_at).toLocaleDateString()} {new Date(item.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </td>
+                  </tr>
+                ))
+                : null}
+            </tbody>
+          </table>
+        </div>
+      </article>
     </AppShell>
   );
 }

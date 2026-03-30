@@ -72,7 +72,7 @@ export default function AdminLivePage() {
       subtitle="Monitor cameras and filter active/offline streams."
     >
       <article className="rail-panel p-5">
-        <div className="grid gap-3 md:grid-cols-4">
+        <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
           {loading
             ? Array.from({ length: 4 }).map((_, index) => (
               <div
@@ -98,7 +98,7 @@ export default function AdminLivePage() {
         {error ? (
           <div
             role="status"
-            className="mt-3 flex flex-wrap items-center gap-3 rounded-xl border border-warning/40 bg-warning/10 px-4 py-3 text-sm text-warning"
+            className="mt-4 flex flex-wrap items-center gap-3 rounded-xl border border-warning/40 bg-warning/10 px-4 py-3 text-sm text-warning"
           >
             <span>Live summary failed to load: {error}</span>
             <button
@@ -112,7 +112,7 @@ export default function AdminLivePage() {
           </div>
         ) : null}
 
-        <div className="flex flex-wrap gap-2">
+        <div className="mt-4 flex flex-wrap gap-2">
           {[
             "Active cameras",
             "Offline cameras",
@@ -127,7 +127,7 @@ export default function AdminLivePage() {
           ))}
         </div>
 
-        <div className="mt-4 grid gap-4 md:grid-cols-2">
+        <div className="mt-4 grid gap-4 grid-cols-1 lg:grid-cols-2">
           {cameraGroups.map((group, index) => (
             <div key={group} className="rounded-xl border border-line bg-surface p-4">
               {loading ? (

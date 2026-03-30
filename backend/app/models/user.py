@@ -18,3 +18,4 @@ class User(Base):
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
     alerts = relationship("Alert", back_populates="user")
+    lost_found_cases = relationship("LostFound", back_populates="user")

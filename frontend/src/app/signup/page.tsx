@@ -70,7 +70,7 @@ function SignUpPageContent() {
   }
 
   return (
-    <main className="rail-gradient flex min-h-screen items-center justify-center p-4">
+    <main className="rail-gradient flex min-h-dvh items-center justify-center p-4">
       <section className="rail-panel w-full max-w-xl p-6 sm:p-8">
         <div className="mb-6 flex items-center justify-between">
           <Link className="text-sm font-semibold text-accent" href="/login">
@@ -180,7 +180,7 @@ export default function SignUpPage() {
   return (
     <Suspense
       fallback={
-        <main className="rail-gradient flex min-h-screen items-center justify-center p-4">
+        <main className="rail-gradient flex min-h-dvh items-center justify-center p-4">
           <section className="rail-panel w-full max-w-xl p-6 sm:p-8">Loading...</section>
         </main>
       }

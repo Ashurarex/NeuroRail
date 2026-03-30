@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import AppShell from "@/components/layout/app-shell";
 
 const statuses = ["All alerts", "Critical", "Active", "Resolved"];
@@ -9,6 +12,9 @@ const types = [
 ];
 
 export default function UserProfilePage() {
+  const [selectedStatus, setSelectedStatus] = useState("All alerts");
+  const [selectedType, setSelectedType] = useState("Object on track");
+
   return (
     <AppShell
       role="user"
@@ -17,7 +23,7 @@ export default function UserProfilePage() {
     >
       <article className="rail-panel p-5">
         <h2 className="text-lg font-semibold">Alert Filters</h2>
-        <div className="mt-3 grid gap-3 md:grid-cols-2">
+        <div className="mt-3 grid gap-3 grid-cols-1 lg:grid-cols-2">
           <div>
             <p className="text-sm font-medium text-muted">Status</p>
             <div className="mt-2 flex flex-wrap gap-2">
@@ -25,7 +31,11 @@ export default function UserProfilePage() {
                 <button
                   key={status}
                   type="button"
-                  className="rounded-full border border-line bg-surface px-3 py-1 text-sm"
+                  onClick={() => setSelectedStatus(status)}
+                  className={`rounded-full border px-3 py-1 text-sm transition ${selectedStatus === status
+                      ? "border-accent bg-accent text-white"
+                      : "border-line bg-surface hover:border-accent"
+                    }`}
                 >
                   {status}
                 </button>
@@ -39,7 +49,11 @@ export default function UserProfilePage() {
                 <button
                   key={type}
                   type="button"
-                  className="rounded-full border border-line bg-surface px-3 py-1 text-sm"
+                  onClick={() => setSelectedType(type)}
+                  className={`rounded-full border px-3 py-1 text-sm transition ${selectedType === type
+                      ? "border-accent bg-accent text-white"
+                      : "border-line bg-surface hover:border-accent"
+                    }`}
                 >
                   {type}
                 </button>
@@ -51,6 +65,10 @@ export default function UserProfilePage() {
 
       <article className="rail-panel p-5">
         <h2 className="text-lg font-semibold">My Alerts</h2>
+        <p className="mt-2 text-xs text-muted">
+          Filtered by: <span className="font-semibold text-accent">{selectedStatus}</span> •{" "}
+          <span className="font-semibold text-accent">{selectedType}</span>
+        </p>
         <ul className="mt-3 space-y-3">
           {[
             "Critical: Object on track at Platform 3",

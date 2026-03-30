@@ -15,6 +15,9 @@ type AppShellProps = {
   role: AppRole;
   title: string;
   subtitle: string;
+  searchValue?: string;
+  onSearchChange?: (value: string) => void;
+  searchPlaceholder?: string;
   children: React.ReactNode;
 };
 
@@ -35,7 +38,15 @@ const ADMIN_NAV: NavItem[] = [
   { label: "Settings", href: "/admin/settings" },
 ];
 
-export default function AppShell({ role, title, subtitle, children }: AppShellProps) {
+export default function AppShell({
+  role,
+  title,
+  subtitle,
+  searchValue,
+  onSearchChange,
+  searchPlaceholder,
+  children,
+}: AppShellProps) {
   const pathname = usePathname();
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -48,10 +59,10 @@ export default function AppShell({ role, title, subtitle, children }: AppShellPr
   }
 
   return (
-    <main className="rail-gradient min-h-screen p-3 sm:p-5">
-      <div className="mx-auto grid max-w-7xl gap-4 lg:grid-cols-[250px_1fr]">
+    <main className="rail-gradient h-dvh overflow-hidden flex flex-col p-3 sm:p-5">
+      <div className="h-full grid w-full gap-4 lg:grid-cols-[250px_1fr]">
         <aside className="rail-panel hidden p-4 lg:block">
-          <Link href="/" className="flex items-center gap-2">
+          <Link href={role === "admin" ? "/admin/dashboard" : "/user/home"} className="flex items-center gap-2">
             <Image
               src="/neurorail-logo.svg"
               alt="NeuroRail logo"
@@ -87,11 +98,11 @@ export default function AppShell({ role, title, subtitle, children }: AppShellPr
           </nav>
         </aside>
 
-        <div className="space-y-4">
-          <header className="rail-panel p-4">
+        <div className="flex flex-col h-full gap-4">
+          <header className="rail-panel p-4 shrink-0">
             <div className="flex items-start justify-between gap-3">
               <div className="flex items-start gap-3">
-                <Link href="/" className="shrink-0">
+                <Link href={role === "admin" ? "/admin/dashboard" : "/user/home"} className="shrink-0">
                   <Image
                     src="/neurorail-logo.svg"
                     alt="NeuroRail logo"
@@ -115,10 +126,14 @@ export default function AppShell({ role, title, subtitle, children }: AppShellPr
               </button>
             </div>
             <div className="mt-3 flex gap-2">
-              <input
-                className="h-10 flex-1 rounded-lg border border-line bg-surface px-3 text-sm"
-                placeholder="Search alerts, cameras, results..."
-              />
+              {onSearchChange ? (
+                <input
+                  className="h-10 flex-1 rounded-lg border border-line bg-surface px-3 text-sm"
+                  placeholder={searchPlaceholder ?? "Search this view..."}
+                  value={searchValue ?? ""}
+                  onChange={(event) => onSearchChange(event.target.value)}
+                />
+              ) : null}
               <span className="rounded-lg bg-amber-100 px-3 py-2 text-xs font-semibold text-amber-800">
                 {role === "admin" ? "Control" : "View"} Mode
               </span>
@@ -150,7 +165,7 @@ export default function AppShell({ role, title, subtitle, children }: AppShellPr
             ) : null}
           </header>
 
-          <section className="space-y-4">{children}</section>
+          <section className="flex-1 space-y-4 overflow-y-auto min-h-0">{children}</section>
         </div>
       </div>
     </main>

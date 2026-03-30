@@ -39,3 +39,7 @@ export function getCookieValue(name: string): string | null {
 export function getAuthToken(): string | null {
   return getCookieValue(AUTH_TOKEN_COOKIE);
 }
+
+export function getAuthRole(): AppRole {
+  return normalizeRole(getCookieValue(AUTH_ROLE_COOKIE));
+}

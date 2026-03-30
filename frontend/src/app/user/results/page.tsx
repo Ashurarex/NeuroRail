@@ -9,6 +9,10 @@ export default function UserResultsPage() {
   const [alerts, setAlerts] = useState<AlertRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [search, setSearch] = useState("");
+  const [confidenceFilter, setConfidenceFilter] = useState("all");
+  const [sortBy, setSortBy] = useState("latest");
+  const [stationFilter, setStationFilter] = useState("all");
 
   useEffect(() => {
     let mounted = true;
@@ -46,42 +50,80 @@ export default function UserResultsPage() {
     };
   }, []);
 
+  const filteredAlerts = alerts.filter((row) => {
+    const term = search.trim().toLowerCase();
+    const matchesSearch =
+      !term ||
+      row.id.toLowerCase().includes(term) ||
+      row.object_type.toLowerCase().includes(term);
+
+    const matchesConfidence =
+      confidenceFilter === "all" ||
+      (confidenceFilter === "high" && row.confidence >= 0.8) ||
+      (confidenceFilter === "medium" && row.confidence >= 0.5 && row.confidence < 0.8) ||
+      (confidenceFilter === "low" && row.confidence < 0.5);
+
+    return matchesSearch && matchesConfidence;
+  }).sort((a, b) => {
+    if (sortBy === "latest") {
+      return new Date(b.created_at ?? 0).getTime() - new Date(a.created_at ?? 0).getTime();
+    }
+    return a.id.localeCompare(b.id);
+  });
+
   return (
     <AppShell
       role="user"
       title="AI Results"
       subtitle="Matching items detected by surveillance and uploads."
+      searchValue={search}
+      onSearchChange={setSearch}
+      searchPlaceholder="Search results by ID or item"
     >
       <article className="rail-panel p-5">
         <div className="mb-4 flex flex-wrap gap-2">
           {[
-            "High confidence",
-            "Latest first",
-            "Nearest station",
+            { label: "High confidence", value: "high" },
+            { label: "Latest first", value: "latest" },
+            { label: "Nearest station", value: "nearest" },
           ].map((filter) => (
             <button
-              key={filter}
+              key={filter.value}
               type="button"
-              className="rounded-full border border-line bg-surface px-3 py-1 text-sm"
+              onClick={() => {
+                if (filter.label === "High confidence") {
+                  setConfidenceFilter(confidenceFilter === "high" ? "all" : "high");
+                } else if (filter.label === "Latest first") {
+                  setSortBy(sortBy === "latest" ? "id" : "latest");
+                } else if (filter.label === "Nearest station") {
+                  setStationFilter(stationFilter === "nearest" ? "all" : "nearest");
+                }
+              }}
+              className={`rounded-full border px-3 py-1 text-sm transition ${(filter.label === "High confidence" && confidenceFilter === "high") ||
+                  (filter.label === "Latest first" && sortBy === "latest") ||
+                  (filter.label === "Nearest station" && stationFilter === "nearest")
+                  ? "border-accent bg-accent text-white"
+                  : "border-line bg-surface hover:border-accent"
+                }`}
             >
-              {filter}
+              {filter.label}
             </button>
           ))}
         </div>
         <div className="overflow-x-auto">
-          <table className="min-w-full text-left text-sm">
+          <table className="w-full text-left text-sm">
             <thead>
-              <tr className="border-b border-line text-muted">
-                <th className="py-2">Match ID</th>
-                <th className="py-2">Item</th>
-                <th className="py-2">Confidence</th>
-                <th className="py-2">Severity</th>
+              <tr className="border-b border-line">
+                <th className="py-3 px-2 font-semibold text-muted">Match ID</th>
+                <th className="py-3 px-2 font-semibold text-muted">Item</th>
+                <th className="py-3 px-2 font-semibold text-muted">Confidence</th>
+                <th className="py-3 px-2 font-semibold text-muted">Severity</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
                 <tr>
-                  <td className="py-4 text-muted" colSpan={4}>
+                  <td className="py-4 px-2 text-muted" colSpan={4}>
                     Loading AI results...
                   </td>
                 </tr>
@@ -89,29 +131,33 @@ export default function UserResultsPage() {
 
               {!loading && error ? (
                 <tr>
-                  <td className="py-4 text-warning" colSpan={4}>
+                  <td className="py-4 px-2 text-warning" colSpan={4}>
                     Error: {error}
                   </td>
                 </tr>
               ) : null}
 
-              {!loading && !error && alerts.length === 0 ? (
+              {!loading && !error && filteredAlerts.length === 0 ? (
                 <tr>
-                  <td className="py-4 text-muted" colSpan={4}>
+                  <td className="py-4 px-2 text-muted" colSpan={4}>
                     No results yet.
                   </td>
                 </tr>
               ) : null}
 
               {!loading && !error
-                ? alerts.map((row) => (
-                    <tr key={row.id} className="border-b border-line/70">
-                      <td className="py-3 font-mono">{row.id}</td>
-                      <td className="py-3 capitalize">{row.object_type}</td>
-                      <td className="py-3">{Math.round(row.confidence * 100)}%</td>
-                      <td className="py-3 capitalize">{row.alert_level}</td>
-                    </tr>
-                  ))
+                ? filteredAlerts.map((row) => (
+                  <tr key={row.id} className="border-b border-line/50 hover:bg-amber-50/30 transition">
+                    <td className="py-3 px-2 font-mono text-xs">{row.id.slice(0, 12)}...</td>
+                    <td className="py-3 px-2 capitalize">{row.object_type}</td>
+                    <td className="py-3 px-2 font-semibold text-blue-600">{Math.round(row.confidence * 100)}%</td>
+                    <td className="py-3 px-2">
+                      <span className="inline-block rounded-full px-2 py-1 text-xs font-semibold capitalize bg-amber-100 text-amber-700">
+                        {row.alert_level}
+                      </span>
+                    </td>
+                  </tr>
+                ))
                 : null}
             </tbody>
           </table>

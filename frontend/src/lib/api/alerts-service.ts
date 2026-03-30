@@ -1,4 +1,5 @@
 import { apiRequest } from "@/lib/api/client";
+import { getAuthToken } from "@/lib/auth";
 import type { AlertRecord } from "@/lib/api/types";
 
 export type AlertFilters = {
@@ -22,5 +23,17 @@ export async function fetchAlerts(filters?: AlertFilters): Promise<AlertRecord[]
 
   return apiRequest<AlertRecord[]>(path, {
     method: "GET",
+  });
+}
+
+export async function deleteAlert(alertId: string): Promise<void> {
+  const token = getAuthToken();
+  if (!token) {
+    throw new Error("Please login again as admin.");
+  }
+
+  await apiRequest(`/alerts/${alertId}`, {
+    method: "DELETE",
+    token,
   });
 }

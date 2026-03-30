@@ -50,10 +50,6 @@ async def login(user: UserLogin, db: AsyncSession = Depends(get_db)) -> TokenRes
     if not db_user or not verify_password(user.password, db_user.password):
         raise HTTPException(status_code=401, detail="Invalid credentials")
 
-    requested_role = user.role or ("admin" if db_user.is_admin else "user")
-    if requested_role == "admin" and not db_user.is_admin:
-        raise HTTPException(status_code=403, detail="Admin access required")
-
     token = create_token({"user_id": str(db_user.id), "is_admin": db_user.is_admin})
     role = "admin" if db_user.is_admin else "user"
     return TokenResponse(access_token=token, role=role)

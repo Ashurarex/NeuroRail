@@ -3,7 +3,6 @@ export type Role = "user" | "admin";
 export type LoginRequest = {
   email: string;
   password: string;
-  role: Role;
 };
 
 export type LoginResponse = {
@@ -54,4 +53,16 @@ export type AlertRecord = {
 export type DetectResponse = {
   message: string;
   alert: AlertRecord;
+};
+
+export type LostFoundStatus = "pending" | "matched" | "verified" | "closed";
+
+export type LostFoundCase = {
+  id: string;
+  status: LostFoundStatus;
+  location: string | null;
+  image_url: string | null;
+  user_id: string | null;
+  alert_id: string | null;
+  created_at: string;
 };

@@ -1,14 +1,32 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import AppShell from "@/components/layout/app-shell";
 import { fetchReportsSummary } from "@/lib/api/reports-service";
+import { getAuthRole } from "@/lib/auth";
+import type { AppRole } from "@/lib/auth";
 import type { ReportsSummary } from "@/lib/api/types";
 
 export default function UserHomePage() {
+  const router = useRouter();
   const [summary, setSummary] = useState<ReportsSummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [role, setRole] = useState<AppRole>("user");
+
+  useEffect(() => {
+    const userRole = getAuthRole();
+    setRole(userRole);
+  }, []);
+  const actions = useMemo(
+    () => [
+      { label: "View Results", href: "/user/results" },
+      { label: "Submit Lost Item", href: "/user/lost-found" },
+      { label: "Open Profile Filters", href: "/user/profile" },
+    ],
+    [],
+  );
 
   useEffect(() => {
     let mounted = true;
@@ -51,11 +69,11 @@ export default function UserHomePage() {
 
   return (
     <AppShell
-      role="user"
+      role={role}
       title="Hey User"
       subtitle="Your safety feed, alerts, and quick actions in one view."
     >
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
         {tiles.map((tile) => (
           <article key={tile.label} className="rail-panel p-4">
             <p className="text-sm text-muted">{tile.label}</p>
@@ -74,18 +92,15 @@ export default function UserHomePage() {
         <p className="text-xs font-semibold uppercase tracking-[0.16em] text-accent">
           Navigation
         </p>
-        <div className="mt-3 grid gap-3 sm:grid-cols-3">
-          {[
-            "View Results",
-            "Submit Lost Item",
-            "Open Profile Filters",
-          ].map((action) => (
+        <div className="mt-3 grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+          {actions.map((action) => (
             <button
-              key={action}
+              key={action.href}
               type="button"
+              onClick={() => router.push(action.href)}
               className="rounded-lg border border-line bg-surface px-3 py-3 text-left text-sm font-semibold"
             >
-              {action}
+              {action.label}
             </button>
           ))}
         </div>

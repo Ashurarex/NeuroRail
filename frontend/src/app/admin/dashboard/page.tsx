@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import AppShell from "@/components/layout/app-shell";
 import { fetchAlerts } from "@/lib/api/alerts-service";
 import { fetchReportsSummary } from "@/lib/api/reports-service";
+import { getAuthRole } from "@/lib/auth";
+import type { AppRole } from "@/lib/auth";
 import type { AlertRecord, ReportsSummary } from "@/lib/api/types";
 
 export default function AdminDashboardPage() {
@@ -11,6 +13,12 @@ export default function AdminDashboardPage() {
   const [alerts, setAlerts] = useState<AlertRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [role, setRole] = useState<AppRole>("admin");
+
+  useEffect(() => {
+    const userRole = getAuthRole();
+    setRole(userRole);
+  }, []);
 
   useEffect(() => {
     let mounted = true;
@@ -59,11 +67,11 @@ export default function AdminDashboardPage() {
 
   return (
     <AppShell
-      role="admin"
+      role={role}
       title="Dashboard"
       subtitle="Main control panel for station safety operations."
     >
-      <div className="grid gap-4 md:grid-cols-4">
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
         {tiles.map((tile) => (
           <article key={tile.label} className="rail-panel p-4">
             <p className="text-sm text-muted">{tile.label}</p>

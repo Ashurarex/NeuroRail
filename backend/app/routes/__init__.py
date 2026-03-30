@@ -3,6 +3,7 @@ from app.routes.admin import router as admin_router
 from app.routes.auth import router as auth_router
 from app.routes.detect import router as detect_router
 from app.routes.detections import router as detections_router
+from app.routes.lost_found import router as lost_found_router
 from app.routes.predictions import router as predictions_router
 from app.routes.reports import router as reports_router
 from app.routes.users import router as users_router
@@ -16,4 +17,5 @@ __all__ = [
 	"users_router",
 	"detections_router",
 	"predictions_router",
+	"lost_found_router",
 ]

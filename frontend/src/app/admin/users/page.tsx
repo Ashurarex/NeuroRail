@@ -48,38 +48,48 @@ export default function AdminUsersPage() {
     >
       <article className="rail-panel p-5">
         <div className="overflow-x-auto">
-          <table className="min-w-full text-sm">
+          <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-line text-left text-muted">
-                <th className="py-2">User</th>
-                <th className="py-2">Role</th>
-                <th className="py-2">Last login</th>
-                <th className="py-2">Status</th>
+              <tr className="border-b border-line">
+                <th className="py-3 px-2 text-left font-semibold text-muted">User</th>
+                <th className="py-3 px-2 text-left font-semibold text-muted">Role</th>
+                <th className="py-3 px-2 text-left font-semibold text-muted">Last Login</th>
+                <th className="py-3 px-2 text-left font-semibold text-muted">Status</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
                 <tr>
-                  <td className="py-3 text-muted" colSpan={4}>Loading users...</td>
+                  <td className="py-4 px-2 text-muted" colSpan={4}>Loading users...</td>
                 </tr>
               ) : null}
               {!loading && error ? (
                 <tr>
-                  <td className="py-3 text-warning" colSpan={4}>Error: {error}</td>
+                  <td className="py-4 px-2 text-warning" colSpan={4}>Error: {error}</td>
                 </tr>
               ) : null}
               {!loading && !error && rows.length === 0 ? (
                 <tr>
-                  <td className="py-3 text-muted" colSpan={4}>No users found.</td>
+                  <td className="py-4 px-2 text-muted" colSpan={4}>No users found.</td>
                 </tr>
               ) : null}
               {!loading && !error
                 ? rows.map((row) => (
-                  <tr key={row.id} className="border-b border-line/70">
-                    <td className="py-3">{row.email}</td>
-                    <td className="py-3 capitalize">{row.role}</td>
-                    <td className="py-3">{row.last_login ?? "-"}</td>
-                    <td className="py-3 capitalize">{row.status}</td>
+                  <tr key={row.id} className="border-b border-line/50 hover:bg-amber-50/30 transition">
+                    <td className="py-3 px-2 font-mono text-xs">{row.email}</td>
+                    <td className="py-3 px-2">
+                      <span className={`inline-block rounded-full px-2 py-1 text-xs font-semibold capitalize ${row.role === "admin" ? "bg-red-100 text-red-700" : "bg-blue-100 text-blue-700"
+                        }`}>
+                        {row.role}
+                      </span>
+                    </td>
+                    <td className="py-3 px-2 text-xs">{row.last_login ?? "-"}</td>
+                    <td className="py-3 px-2">
+                      <span className={`inline-block rounded-full px-2 py-1 text-xs font-semibold capitalize ${row.status === "active" ? "bg-emerald-100 text-emerald-700" : "bg-slate-100 text-slate-700"
+                        }`}>
+                        {row.status}
+                      </span>
+                    </td>
                   </tr>
                 ))
                 : null}
