@@ -60,7 +60,7 @@ export default function AppShell({
 
   return (
     <main className="rail-gradient h-dvh overflow-hidden flex flex-col p-3 sm:p-5">
-      <div className="h-full grid w-full gap-4 lg:grid-cols-[250px_1fr]">
+      <div className="h-full min-h-0 grid w-full gap-4 lg:grid-cols-[250px_1fr]">
         <aside className="rail-panel hidden p-4 lg:block">
           <Link href={role === "admin" ? "/admin/dashboard" : "/user/home"} className="flex items-center gap-2">
             <Image
@@ -98,7 +98,7 @@ export default function AppShell({
           </nav>
         </aside>
 
-        <div className="flex flex-col h-full gap-4">
+        <div className="flex flex-col h-full gap-4 min-h-0">
           <header className="rail-panel p-4 shrink-0">
             <div className="flex items-start justify-between gap-3">
               <div className="flex items-start gap-3">

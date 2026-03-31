@@ -1,0 +1,3 @@
+[submodule "ml-model"]
+	path = ml-model
+	url = https://github.com/priyamredker/NeuroRailML.git

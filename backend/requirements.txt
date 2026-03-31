@@ -6,3 +6,13 @@ python-dotenv==1.0.1
 python-jose[cryptography]==3.3.0
 passlib[bcrypt]==1.7.4
 python-multipart==0.0.12
+
+# ── ML inference (install the ones relevant to your model) ──────────────────
+ultralytics>=8.0.0       # YOLOv8  (.pt / .pth)
+Pillow>=10.0.0           # image preprocessing
+numpy>=1.24.0            # array ops
+
+# optional – uncomment as needed:
+# onnxruntime>=1.17.0    # ONNX models (.onnx)
+# torch>=2.0.0           # raw PyTorch (.pt / .pth without ultralytics)
+# joblib>=1.3.0          # sklearn/joblib models (.pkl)

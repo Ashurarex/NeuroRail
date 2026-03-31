@@ -1,4 +1,5 @@
 from contextlib import asynccontextmanager
+import logging
 
 from fastapi import Depends, FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
@@ -6,6 +7,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.auth import verify_token
 from app.database import Base, engine, get_db
+from app.services.ml_service import ml_service  # initialised at import time
+
+logger = logging.getLogger(__name__)
 from app import models
 from app.routes import (
     admin_router,
@@ -25,6 +29,12 @@ from app.websocket.manager import manager
 async def lifespan(_: FastAPI):
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+    logger.info(
+        "ML service ready=%s type=%s path=%s",
+        ml_service.is_ready,
+        ml_service.model_type,
+        ml_service.model_path,
+    )
     yield
 
 app = FastAPI(
@@ -152,17 +162,4 @@ app.include_router(predictions_router)
 app.include_router(lost_found_router)
 
 
-# -------------------------
-# ❤️ HEALTH CHECK
-# -------------------------
-@app.get("/health")
-def health():
-    return {
-        "status": "ok",
-        "service": "NeuroRail Backend",
-        "features": [
-            "alerts",
-            "reports",
-            "websockets"
-        ]
-    }
+# (duplicate /health removed – the async version above is canonical)
