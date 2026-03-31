@@ -1,30 +1,50 @@
 @import "tailwindcss";
 
+/* ═══════════════════════════════════════════════════════════════════
+   NeuroRail  ·  Design System
+   ═══════════════════════════════════════════════════════════════════ */
+
 :root {
   --background: #f7f5ef;
   --foreground: #0f172a;
   --surface: #fffdf6;
+  --surface-alt: #f5f2ea;
   --panel: #ffffff;
   --muted: #5b6475;
   --accent: #0b8f87;
   --accent-strong: #06645f;
+  --accent-glow: rgba(11, 143, 135, 0.25);
   --warning: #f97316;
+  --danger: #ef4444;
   --line: #d9d7d0;
+  --line-strong: #c0bdb4;
+
+  /* elevation */
+  --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.06);
+  --shadow-md: 0 8px 24px -8px rgba(15, 23, 42, 0.12);
+  --shadow-lg: 0 16px 40px -24px rgba(15, 23, 42, 0.35);
+  --shadow-glow: 0 0 0 3px var(--accent-glow);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-surface: var(--surface);
+  --color-surface-alt: var(--surface-alt);
   --color-panel: var(--panel);
   --color-muted: var(--muted);
   --color-accent: var(--accent);
   --color-accent-strong: var(--accent-strong);
+  --color-accent-glow: var(--accent-glow);
   --color-warning: var(--warning);
+  --color-danger: var(--danger);
   --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
   --font-sans: var(--font-space-grotesk);
   --font-mono: var(--font-jetbrains-mono);
 }
+
+/* ── base resets ───────────────────────────────────────────────────── */
 
 * {
   box-sizing: border-box;
@@ -39,70 +59,312 @@ body {
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-space-grotesk), sans-serif;
+  font-family: var(--font-space-grotesk), system-ui, sans-serif;
   min-height: 100dvh;
   overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-img,
-svg,
-video,
-canvas {
+img, svg, video, canvas {
   max-width: 100%;
   height: auto;
 }
 
-input,
-select,
-textarea,
-button {
+input, select, textarea, button {
   font: inherit;
 }
 
+/* ── scrollbar (webkit) ────────────────────────────────────────────── */
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--line);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+
+/* ═══════════════════════════════════════════════════════════════════
+   Reusable component classes
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── gradient background ───────────────────────────────────────────── */
 .rail-gradient {
   background:
-    radial-gradient(
-      circle at 15% 20%,
-      rgba(11, 143, 135, 0.2),
-      transparent 25%
-    ),
-    radial-gradient(
-      circle at 80% 0%,
-      rgba(249, 115, 22, 0.17),
-      transparent 30%
-    ),
+    radial-gradient(circle at 15% 20%, rgba(11, 143, 135, 0.18), transparent 25%),
+    radial-gradient(circle at 80% 0%, rgba(249, 115, 22, 0.14), transparent 30%),
+    radial-gradient(circle at 55% 85%, rgba(11, 143, 135, 0.06), transparent 35%),
     linear-gradient(145deg, #fffdf6 0%, #f5f2e8 42%, #ece8dc 100%);
 }
 
+/* ── panels ────────────────────────────────────────────────────────── */
 .rail-panel {
   background: var(--panel);
   border: 1px solid var(--line);
   border-radius: 1rem;
-  box-shadow: 0 16px 40px -24px rgba(15, 23, 42, 0.35);
+  box-shadow: var(--shadow-lg);
+  transition: box-shadow 0.25s ease, border-color 0.25s ease;
 }
 
+.rail-panel-hover:hover {
+  box-shadow: var(--shadow-lg), var(--shadow-glow);
+  border-color: var(--accent);
+}
+
+/* ── dot indicator ─────────────────────────────────────────────────── */
 .rail-dot {
   width: 0.625rem;
   height: 0.625rem;
   border-radius: 9999px;
 }
 
-.stagger-in {
-  animation: rise 420ms ease forwards;
+/* ── focus ring ────────────────────────────────────────────────────── */
+.rail-focus:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-glow);
+  border-color: var(--accent);
 }
 
+/* ── input base ────────────────────────────────────────────────────── */
+.rail-input {
+  height: 2.75rem;
+  border-radius: 0.75rem;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  padding: 0 0.75rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.rail-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: var(--shadow-glow);
+}
+.rail-input::placeholder {
+  color: var(--muted);
+  opacity: 0.6;
+}
+
+/* ── button base ───────────────────────────────────────────────────── */
+.rail-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+.rail-btn:active:not(:disabled) {
+  transform: scale(0.97);
+}
+.rail-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.rail-btn-primary {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+}
+.rail-btn-primary:hover:not(:disabled) {
+  background: var(--accent-strong);
+  box-shadow: var(--shadow-md);
+}
+
+.rail-btn-ghost {
+  background: transparent;
+  border: 1px solid var(--line);
+}
+.rail-btn-ghost:hover:not(:disabled) {
+  background: var(--surface-alt);
+  border-color: var(--line-strong);
+}
+
+/* ── nav link ──────────────────────────────────────────────────────── */
+.rail-nav-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--foreground);
+  transition: all 0.2s ease;
+  border-left: 2px solid transparent;
+}
+.rail-nav-link:hover {
+  background: rgba(11, 143, 135, 0.06);
+  transform: translateX(2px);
+}
+.rail-nav-link.active {
+  background: rgba(11, 143, 135, 0.1);
+  color: var(--accent);
+  font-weight: 600;
+  border-left-color: var(--accent);
+}
+
+/* ── badge ─────────────────────────────────────────────────────────── */
+.rail-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  border-radius: 9999px;
+  padding: 0.25rem 0.625rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+/* ── skeleton shimmer ──────────────────────────────────────────────── */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--surface-alt) 25%,
+    var(--surface) 37%,
+    var(--surface-alt) 63%
+  );
+  background-size: 400% 100%;
+  animation: shimmer 1.4s ease infinite;
+  border-radius: 0.5rem;
+}
+
+/* ── stat card accent border ───────────────────────────────────────── */
+.stat-card {
+  position: relative;
+  overflow: hidden;
+}
+.stat-card::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: var(--accent);
+}
+.stat-card[data-priority="high"]::before   { background: var(--danger); }
+.stat-card[data-priority="medium"]::before { background: var(--warning); }
+.stat-card[data-priority="low"]::before    { background: #3b82f6; }
+
+/* ═══════════════════════════════════════════════════════════════════
+   Animations  — all GPU-accelerated (transform + opacity only)
+   ═══════════════════════════════════════════════════════════════════ */
+
+.stagger-in {
+  animation: slideUp 350ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.animate-fade-in {
+  animation: fadeIn 250ms ease forwards;
+}
+
+.animate-slide-up {
+  animation: slideUp 350ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.animate-slide-in {
+  animation: slideIn 250ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.animate-scale-in {
+  animation: scaleIn 300ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* ── stagger delay utilities ───────────────────────────────────────── */
+.delay-0   { animation-delay: 0ms; }
+.delay-1   { animation-delay: 60ms; }
+.delay-2   { animation-delay: 120ms; }
+.delay-3   { animation-delay: 180ms; }
+.delay-4   { animation-delay: 240ms; }
+.delay-5   { animation-delay: 300ms; }
+
+/* Start invisible when using delays so they don't flash */
+[class*="delay-"].animate-slide-up,
+[class*="delay-"].animate-fade-in,
+[class*="delay-"].animate-scale-in {
+  opacity: 0;
+}
+
+/* ── keyframes ─────────────────────────────────────────────────────── */
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* legacy alias */
 @keyframes rise {
-  from {
-    opacity: 0;
-    transform: translateY(12px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(-12px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes shimmer {
+  0%   { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
 @keyframes scan {
   0%   { transform: translateY(-100%); }
   100% { transform: translateY(200%); }
+}
+
+@keyframes pulseRing {
+  0%   { box-shadow: 0 0 0 0 var(--accent-glow); }
+  70%  { box-shadow: 0 0 0 8px rgba(11, 143, 135, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(11, 143, 135, 0); }
+}
+
+@keyframes breathe {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.04); }
+}
+
+/* ── spinner ───────────────────────────────────────────────────────── */
+.rail-spinner {
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 2px solid var(--line);
+  border-top-color: var(--accent);
+  border-radius: 9999px;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── table styling ─────────────────────────────────────────────────── */
+.rail-table th {
+  position: sticky;
+  top: 0;
+  background: var(--panel);
+  z-index: 1;
+}
+
+.rail-table tbody tr {
+  transition: background-color 0.15s ease;
+}
+
+.rail-table tbody tr:hover {
+  background: rgba(11, 143, 135, 0.04);
 }

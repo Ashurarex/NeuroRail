@@ -80,7 +80,7 @@ export default function UserResultsPage() {
       onSearchChange={setSearch}
       searchPlaceholder="Search results by ID or item"
     >
-      <article className="rail-panel p-5">
+      <article className="rail-panel p-5 animate-slide-up">
         <div className="mb-4 flex flex-wrap gap-2">
           {[
             { label: "High confidence", value: "high" },
@@ -99,11 +99,11 @@ export default function UserResultsPage() {
                   setStationFilter(stationFilter === "nearest" ? "all" : "nearest");
                 }
               }}
-              className={`rounded-full border px-3 py-1 text-sm transition ${(filter.label === "High confidence" && confidenceFilter === "high") ||
+              className={`rounded-full border px-3 py-1 text-sm font-medium transition active:scale-95 ${(filter.label === "High confidence" && confidenceFilter === "high") ||
                   (filter.label === "Latest first" && sortBy === "latest") ||
                   (filter.label === "Nearest station" && stationFilter === "nearest")
-                  ? "border-accent bg-accent text-white"
-                  : "border-line bg-surface hover:border-accent"
+                  ? "border-accent bg-accent/10 text-accent"
+                  : "border-line bg-surface hover:border-line-strong"
                 }`}
             >
               {filter.label}
@@ -111,22 +111,25 @@ export default function UserResultsPage() {
           ))}
         </div>
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
+          <table className="rail-table w-full text-left text-sm">
             <thead>
               <tr className="border-b border-line">
-                <th className="py-3 px-2 font-semibold text-muted">Match ID</th>
-                <th className="py-3 px-2 font-semibold text-muted">Item</th>
-                <th className="py-3 px-2 font-semibold text-muted">Confidence</th>
-                <th className="py-3 px-2 font-semibold text-muted">Severity</th>
+                <th className="py-3 px-3 text-[11px] font-bold uppercase tracking-wider text-muted">Match ID</th>
+                <th className="py-3 px-3 text-[11px] font-bold uppercase tracking-wider text-muted">Item</th>
+                <th className="py-3 px-3 text-[11px] font-bold uppercase tracking-wider text-muted">Confidence</th>
+                <th className="py-3 px-3 text-[11px] font-bold uppercase tracking-wider text-muted">Severity</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
-                <tr>
-                  <td className="py-4 px-2 text-muted" colSpan={4}>
-                    Loading AI results...
-                  </td>
-                </tr>
+                Array.from({ length: 5 }).map((_, i) => (
+                  <tr key={`sk-${i}`} className="border-b border-line/30">
+                    <td className="py-3 px-3"><div className="skeleton h-3 w-24" /></td>
+                    <td className="py-3 px-3"><div className="skeleton h-3 w-14" /></td>
+                    <td className="py-3 px-3"><div className="skeleton h-3 w-10" /></td>
+                    <td className="py-3 px-3"><div className="skeleton h-5 w-14 rounded-full" /></td>
+                  </tr>
+                ))
               ) : null}
 
               {!loading && error ? (
@@ -147,12 +150,15 @@ export default function UserResultsPage() {
 
               {!loading && !error
                 ? filteredAlerts.map((row) => (
-                  <tr key={row.id} className="border-b border-line/50 hover:bg-amber-50/30 transition">
-                    <td className="py-3 px-2 font-mono text-xs">{row.id.slice(0, 12)}...</td>
-                    <td className="py-3 px-2 capitalize">{row.object_type}</td>
-                    <td className="py-3 px-2 font-semibold text-blue-600">{Math.round(row.confidence * 100)}%</td>
-                    <td className="py-3 px-2">
-                      <span className="inline-block rounded-full px-2 py-1 text-xs font-semibold capitalize bg-amber-100 text-amber-700">
+                  <tr key={row.id} className="border-b border-line/30 transition">
+                    <td className="py-3 px-3 font-mono text-xs text-muted">{row.id.slice(0, 12)}…</td>
+                    <td className="py-3 px-3 capitalize">{row.object_type}</td>
+                    <td className="py-3 px-3 font-semibold text-accent">{Math.round(row.confidence * 100)}%</td>
+                    <td className="py-3 px-3">
+                      <span className={`rail-badge capitalize ${row.alert_level === 'high' ? 'bg-red-100 text-red-700' :
+                          row.alert_level === 'medium' ? 'bg-amber-100 text-amber-700' :
+                            'bg-blue-100 text-blue-700'
+                        }`}>
                         {row.alert_level}
                       </span>
                     </td>

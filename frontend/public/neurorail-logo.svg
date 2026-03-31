@@ -1,17 +1,46 @@
 <svg viewBox="0 0 320 320" xmlns="http://www.w3.org/2000/svg">
-  <circle cx="160" cy="160" r="150" fill="#E3E6FF" stroke="#4B4F8A" stroke-width="12" />
-  <circle cx="160" cy="160" r="112" fill="#4B4F8A" />
-  <circle cx="160" cy="160" r="92" fill="none" stroke="#FF8C7A" stroke-width="14" />
-  <circle cx="160" cy="160" r="26" fill="#9AA3FF" />
-  <path
-    d="M102 160c10-28 33-46 58-46h-80z"
-    fill="#FF8C7A"
-  />
-  <path
-    d="M218 160c-10-28-33-46-58-46h80z"
-    fill="#FF8C7A"
-  />
-  <circle cx="62" cy="160" r="12" fill="#4B4F8A" />
-  <circle cx="258" cy="160" r="12" fill="#4B4F8A" />
-  <rect x="76" y="250" width="168" height="40" rx="18" fill="#E3E6FF" stroke="#4B4F8A" stroke-width="10" />
+  <!-- Shield shape — protection/surveillance -->
+  <path d="M160 16 C 56 16, 28 80, 28 160 C 28 232, 84 296, 160 312 C 236 296, 292 232, 292 160 C 292 80, 264 16, 160 16Z" fill="#0f172a" />
+  <path d="M160 30 C 66 30, 42 88, 42 160 C 42 226, 92 284, 160 298 C 228 284, 278 226, 278 160 C 278 88, 254 30, 160 30Z" fill="#0b8f87" />
+
+  <!-- Inner dark circle — lens / core -->
+  <circle cx="160" cy="148" r="64" fill="#0f172a" />
+
+  <!-- AI neural node — centre dot -->
+  <circle cx="160" cy="148" r="14" fill="#5eead4" />
+
+  <!-- Neural connections — 4 radiating lines -->
+  <line x1="160" y1="134" x2="160" y2="100" stroke="#5eead4" stroke-width="2.5" stroke-linecap="round" opacity="0.7" />
+  <line x1="174" y1="148" x2="208" y2="148" stroke="#5eead4" stroke-width="2.5" stroke-linecap="round" opacity="0.7" />
+  <line x1="146" y1="148" x2="112" y2="148" stroke="#5eead4" stroke-width="2.5" stroke-linecap="round" opacity="0.7" />
+  <line x1="160" y1="162" x2="160" y2="196" stroke="#5eead4" stroke-width="2.5" stroke-linecap="round" opacity="0.7" />
+
+  <!-- Outer ring nodes -->
+  <circle cx="160" cy="96" r="5" fill="#5eead4" opacity="0.6" />
+  <circle cx="212" cy="148" r="5" fill="#5eead4" opacity="0.6" />
+  <circle cx="108" cy="148" r="5" fill="#5eead4" opacity="0.6" />
+  <circle cx="160" cy="200" r="5" fill="#5eead4" opacity="0.6" />
+
+  <!-- Diagonal connections -->
+  <line x1="170" y1="138" x2="194" y2="114" stroke="#5eead4" stroke-width="1.5" stroke-linecap="round" opacity="0.4" />
+  <line x1="150" y1="138" x2="126" y2="114" stroke="#5eead4" stroke-width="1.5" stroke-linecap="round" opacity="0.4" />
+  <line x1="170" y1="158" x2="194" y2="182" stroke="#5eead4" stroke-width="1.5" stroke-linecap="round" opacity="0.4" />
+  <line x1="150" y1="158" x2="126" y2="182" stroke="#5eead4" stroke-width="1.5" stroke-linecap="round" opacity="0.4" />
+  <circle cx="196" cy="112" r="3" fill="#5eead4" opacity="0.35" />
+  <circle cx="124" cy="112" r="3" fill="#5eead4" opacity="0.35" />
+  <circle cx="196" cy="184" r="3" fill="#5eead4" opacity="0.35" />
+  <circle cx="124" cy="184" r="3" fill="#5eead4" opacity="0.35" />
+
+  <!-- Scan ring — concentric targeting overlay -->
+  <circle cx="160" cy="148" r="44" fill="none" stroke="#5eead4" stroke-width="1.5" opacity="0.25" stroke-dasharray="6 4" />
+
+  <!-- Rail tracks at bottom of shield -->
+  <rect x="78" y="256" width="164" height="6" rx="3" fill="#5eead4" opacity="0.8" />
+  <rect x="78" y="268" width="164" height="6" rx="3" fill="#5eead4" opacity="0.8" />
+  <!-- Rail ties -->
+  <rect x="100" y="252" width="5" height="26" rx="2" fill="#0f172a" opacity="0.7" />
+  <rect x="130" y="252" width="5" height="26" rx="2" fill="#0f172a" opacity="0.7" />
+  <rect x="160" y="252" width="5" height="26" rx="2" fill="#0f172a" opacity="0.7" />
+  <rect x="190" y="252" width="5" height="26" rx="2" fill="#0f172a" opacity="0.7" />
+  <rect x="220" y="252" width="5" height="26" rx="2" fill="#0f172a" opacity="0.7" />
 </svg>

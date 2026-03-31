@@ -37,3 +37,15 @@ export async function deleteAlert(alertId: string): Promise<void> {
     token,
   });
 }
+
+/**
+ * Delete all provided alert IDs in parallel.
+ * Uses Promise.allSettled so a single failure does not abort the rest.
+ * Returns the count of successfully deleted alerts.
+ */
+export async function deleteAllAlerts(alertIds: string[]): Promise<number> {
+  if (alertIds.length === 0) return 0;
+  const results = await Promise.allSettled(alertIds.map((id) => deleteAlert(id)));
+  return results.filter((r) => r.status === "fulfilled").length;
+}
+

@@ -8,6 +8,24 @@ import { getAuthRole } from "@/lib/auth";
 import type { AppRole } from "@/lib/auth";
 import type { ReportsSummary } from "@/lib/api/types";
 
+const ACTION_ICONS: Record<string, React.ReactNode> = {
+  "/user/results": (
+    <svg className="h-5 w-5 text-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+      <line x1="18" y1="20" x2="18" y2="10" /><line x1="12" y1="20" x2="12" y2="4" /><line x1="6" y1="20" x2="6" y2="14" />
+    </svg>
+  ),
+  "/user/lost-found": (
+    <svg className="h-5 w-5 text-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="11" cy="11" r="8" /><path d="M21 21l-4.35-4.35" />
+    </svg>
+  ),
+  "/user/profile": (
+    <svg className="h-5 w-5 text-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" /><circle cx="12" cy="7" r="4" />
+    </svg>
+  ),
+};
+
 export default function UserHomePage() {
   const router = useRouter();
   const [summary, setSummary] = useState<ReportsSummary | null>(null);
@@ -19,6 +37,7 @@ export default function UserHomePage() {
     const userRole = getAuthRole();
     setRole(userRole);
   }, []);
+
   const actions = useMemo(
     () => [
       { label: "View Results", href: "/user/results" },
@@ -62,9 +81,9 @@ export default function UserHomePage() {
   }, []);
 
   const tiles = [
-    { label: "Total Alerts", value: summary?.total ?? 0 },
-    { label: "High Priority", value: summary?.high ?? 0 },
-    { label: "Medium Priority", value: summary?.medium ?? 0 },
+    { label: "Total Alerts", value: summary?.total ?? 0, priority: "" },
+    { label: "High Priority", value: summary?.high ?? 0, priority: "high" },
+    { label: "Medium Priority", value: summary?.medium ?? 0, priority: "medium" },
   ];
 
   return (
@@ -74,33 +93,50 @@ export default function UserHomePage() {
       subtitle="Your safety feed, alerts, and quick actions in one view."
     >
       <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-        {tiles.map((tile) => (
-          <article key={tile.label} className="rail-panel p-4">
-            <p className="text-sm text-muted">{tile.label}</p>
-            <p className="mt-2 text-3xl font-bold">
-              {loading ? "--" : tile.value}
-            </p>
+        {tiles.map((tile, i) => (
+          <article
+            key={tile.label}
+            className={`rail-panel stat-card p-4 animate-slide-up delay-${i}`}
+            data-priority={tile.priority || undefined}
+          >
+            {loading ? (
+              <div className="space-y-3">
+                <div className="skeleton h-3 w-24" />
+                <div className="skeleton h-8 w-14" />
+              </div>
+            ) : (
+              <>
+                <p className="text-xs font-semibold uppercase tracking-wide text-muted">{tile.label}</p>
+                <p className="mt-2 text-3xl font-bold tracking-tight">{tile.value}</p>
+              </>
+            )}
           </article>
         ))}
       </div>
 
       {error ? (
-        <p className="text-sm text-warning">{error}</p>
+        <div className="rounded-xl border border-warning/40 bg-warning/10 px-4 py-3 text-sm text-warning animate-slide-up">
+          {error}
+        </div>
       ) : null}
 
-      <article className="rail-panel p-5">
-        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-accent">
-          Navigation
+      <article className="rail-panel p-5 animate-slide-up delay-3">
+        <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-accent">
+          Quick Actions
         </p>
         <div className="mt-3 grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-          {actions.map((action) => (
+          {actions.map((action, i) => (
             <button
               key={action.href}
               type="button"
               onClick={() => router.push(action.href)}
-              className="rounded-lg border border-line bg-surface px-3 py-3 text-left text-sm font-semibold"
+              className={`group rail-panel rail-panel-hover flex items-center gap-3 px-4 py-4 text-left text-sm font-semibold transition-all hover:-translate-y-0.5 animate-slide-up delay-${i + 3}`}
             >
-              {action.label}
+              {ACTION_ICONS[action.href]}
+              <span>{action.label}</span>
+              <svg className="ml-auto h-4 w-4 text-muted opacity-0 transition group-hover:opacity-100 group-hover:translate-x-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="9 18 15 12 9 6" />
+              </svg>
             </button>
           ))}
         </div>

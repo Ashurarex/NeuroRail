@@ -71,9 +71,10 @@ function SignUpPageContent() {
 
   return (
     <main className="rail-gradient flex min-h-dvh items-center justify-center p-4">
-      <section className="rail-panel w-full max-w-xl p-6 sm:p-8">
+      <section className="rail-panel w-full max-w-xl p-6 sm:p-8 animate-fade-in">
         <div className="mb-6 flex items-center justify-between">
-          <Link className="text-sm font-semibold text-accent" href="/login">
+          <Link className="flex items-center gap-1 text-sm font-semibold text-accent hover:underline transition" href="/login">
+            <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6" /></svg>
             Back
           </Link>
           <p className="text-xs uppercase tracking-[0.15em] text-muted">Sign Up</p>
@@ -95,7 +96,7 @@ function SignUpPageContent() {
 
         <form className="mt-6 space-y-4" onSubmit={onSubmit}>
           {error ? (
-            <div className="rounded-xl border border-warning/40 bg-warning/10 px-4 py-3 text-sm text-warning">
+            <div className="rounded-xl border border-warning/40 bg-warning/10 px-4 py-3 text-sm text-warning animate-slide-up">
               {error}
             </div>
           ) : null}
@@ -111,7 +112,7 @@ function SignUpPageContent() {
             <input
               id="email"
               type="email"
-              className="h-11 rounded-xl border border-line bg-surface px-3"
+              className="rail-input w-full"
               value={form.email}
               onChange={(event) => update("email", event.target.value)}
               required
@@ -124,7 +125,7 @@ function SignUpPageContent() {
               id="phone"
               type="tel"
               placeholder="+919876543210"
-              className="h-11 rounded-xl border border-line bg-surface px-3"
+              className="rail-input w-full"
               value={form.phone}
               onChange={(event) => update("phone", event.target.value)}
               required
@@ -136,7 +137,7 @@ function SignUpPageContent() {
             <input
               id="password"
               type="password"
-              className="h-11 rounded-xl border border-line bg-surface px-3"
+              className="rail-input w-full"
               value={form.password}
               onChange={(event) => update("password", event.target.value)}
               required
@@ -148,7 +149,7 @@ function SignUpPageContent() {
             <input
               id="confirm-password"
               type="password"
-              className="h-11 rounded-xl border border-line bg-surface px-3"
+              className="rail-input w-full"
               value={form.confirmPassword}
               onChange={(event) => update("confirmPassword", event.target.value)}
               required
@@ -158,9 +159,9 @@ function SignUpPageContent() {
           <button
             type="submit"
             disabled={!valid || pending}
-            className="h-11 w-full rounded-xl bg-accent px-4 font-semibold text-white transition hover:bg-accent-strong disabled:cursor-not-allowed disabled:bg-slate-400"
+            className="rail-btn rail-btn-primary h-11 w-full text-sm"
           >
-            {pending ? "Creating account..." : "Sign up"}
+            {pending ? (<><span className="rail-spinner" /> Creating account…</>) : "Sign up"}
           </button>
 
         </form>

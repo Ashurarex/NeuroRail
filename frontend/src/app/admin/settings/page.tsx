@@ -25,19 +25,19 @@ export default function AdminSettingsPage() {
       title="Settings"
       subtitle="Configure system, alerts, camera setup, and role access."
     >
-      <article className="rail-panel p-5">
+      <article className="rail-panel p-5 animate-slide-up">
         {!activeBlock ? (
           <>
             <h2 className="text-lg font-semibold">Configuration Blocks</h2>
             <div className="mt-4 grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {configBlocks.map((block) => (
+              {configBlocks.map((block, i) => (
                 <button
                   key={block.id}
                   type="button"
                   onClick={() => handleBlockClick(block.id)}
-                  className="rounded-lg border border-line bg-surface px-4 py-3 text-left transition hover:bg-amber-50 hover:border-accent"
+                  className={`rail-panel rail-panel-hover rounded-xl px-4 py-4 text-left transition-all hover:-translate-y-0.5 animate-slide-up delay-${Math.min(i, 5)}`}
                 >
-                  <h3 className="font-semibold text-accent">{block.label}</h3>
+                  <h3 className="font-bold text-accent">{block.label}</h3>
                   <p className="mt-1 text-xs text-muted">{block.description}</p>
                 </button>
               ))}
@@ -49,11 +49,10 @@ export default function AdminSettingsPage() {
               <button
                 type="button"
                 onClick={() => setActiveBlock(null)}
-                className="flex items-center gap-2 rounded-md bg-surface px-3 py-1.5 text-sm font-medium text-foreground hover:bg-neutral-100 border border-line transition"
+                className="rail-btn rail-btn-ghost flex items-center gap-2 text-sm"
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="m12 19-7-7 7-7" />
-                  <path d="M19 12H5" />
+                  <polyline points="15 18 9 12 15 6" />
                 </svg>
                 Back to Settings
               </button>
@@ -70,7 +69,7 @@ export default function AdminSettingsPage() {
                   Configuration options for <span className="font-semibold">{activeBlockData?.label}</span> will be available here.
                 </p>
                 <div className="mt-4">
-                  <button className="rounded bg-accent px-4 py-2 text-white hover:bg-accent/90 transition">
+                  <button className="rail-btn rail-btn-primary px-5 py-2 text-sm">
                     Save Configuration
                   </button>
                 </div>
