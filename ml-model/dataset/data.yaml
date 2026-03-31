@@ -1,0 +1,22 @@
+# NeuroRail – YOLOv8 Dataset Configuration
+# ─────────────────────────────────────────
+# This file is consumed by train.py and Ultralytics directly.
+# All paths are relative to this file's location.
+
+path: .                          # root = ml-model/dataset/
+train: images/train
+val:   images/val
+# test: images/test              # uncomment when you have a held-out test set
+
+# ── Classes ──────────────────────────────────────────────────────────────────
+nc: 3                            # number of classes
+
+names:
+  0: person                      # any human on or near the track
+  1: bag                         # luggage, backpacks, suspicious items
+  2: object                      # generic obstacle (debris, equipment, animals…)
+
+# ── Class weights (used during loss if you enable fl_gamma) ──────────────────
+# Adjust if your dataset is highly imbalanced.
+# Higher weight → model penalised more for missing that class.
+# weights: [1.0, 2.0, 1.5]      # uncomment and tune after first training run

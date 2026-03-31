@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.pyc
+
+# Jupyter
+.ipynb_checkpoints/
+
+# YOLO / training outputs
+runs/
+*.cache
+
+# Models (large files)
+*.pt
+
+# Videos (optional, large)
+videos/*.mp4
+
+# OS
+.DS_Store
+Thumbs.db
