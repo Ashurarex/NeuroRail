@@ -110,7 +110,7 @@ function LoginPageContent() {
               id="password"
               type="password"
               className="rail-input w-full"
-              placeholder="At least 8 characters"
+              placeholder="At least 6 characters"
               value={password}
               onChange={(event) => setPassword(event.target.value)}
               required
