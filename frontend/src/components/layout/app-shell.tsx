@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { clearAuthSession, type AppRole } from "@/lib/auth";
+import { useTheme } from "@/components/theme-provider";
 
 /* ── types ─────────────────────────────────────────────────────────── */
 
@@ -90,6 +91,16 @@ const icon = {
       <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
     </svg>
   ),
+  moon: (
+    <svg className={sz} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" />
+    </svg>
+  ),
+  sun: (
+    <svg className={sz} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="5" /><line x1="12" y1="1" x2="12" y2="3" /><line x1="12" y1="21" x2="12" y2="23" /><line x1="4.22" y1="4.22" x2="5.64" y2="5.64" /><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" /><line x1="1" y1="12" x2="3" y2="12" /><line x1="21" y1="12" x2="23" y2="12" /><line x1="4.22" y1="19.78" x2="5.64" y2="18.36" /><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+    </svg>
+  ),
 };
 
 /* ── nav config ────────────────────────────────────────────────────── */
@@ -125,6 +136,7 @@ export default function AppShell({
   const pathname = usePathname();
   const router = useRouter();
   const [open, setOpen] = useState(false);
+  const { theme, setTheme } = useTheme();
 
   const navItems = useMemo(() => (role === "admin" ? ADMIN_NAV : USER_NAV), [role]);
 
@@ -218,15 +230,27 @@ export default function AppShell({
                 </div>
               </div>
 
-              {/* Mobile menu toggle */}
-              <button
-                type="button"
-                className="rounded-lg border border-line p-2 text-muted transition hover:text-foreground hover:border-line-strong lg:hidden"
-                onClick={() => setOpen((prev) => !prev)}
-                aria-label={open ? "Close menu" : "Open menu"}
-              >
-                {open ? icon.close : icon.menu}
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                  className="rounded-lg border border-line p-2 text-muted transition hover:text-foreground hover:border-line-strong"
+                  aria-label="Toggle theme"
+                  title="Toggle theme"
+                >
+                  {theme === 'dark' ? icon.sun : icon.moon}
+                </button>
+
+                {/* Mobile menu toggle */}
+                <button
+                  type="button"
+                  className="rounded-lg border border-line p-2 text-muted transition hover:text-foreground hover:border-line-strong lg:hidden"
+                  onClick={() => setOpen((prev) => !prev)}
+                  aria-label={open ? "Close menu" : "Open menu"}
+                >
+                  {open ? icon.close : icon.menu}
+                </button>
+              </div>
             </div>
 
             {/* Search + mode badge */}
