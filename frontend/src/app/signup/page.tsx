@@ -70,8 +70,9 @@ function SignUpPageContent() {
   }
 
   return (
-    <main className="rail-gradient flex min-h-dvh items-center justify-center p-4">
-      <section className="rail-panel w-full max-w-xl p-6 sm:p-8 animate-fade-in">
+    <main className="rail-gradient relative overflow-hidden flex min-h-dvh items-center justify-center p-4">
+      <div className="rail-dynamic-grid" />
+      <section className="rail-panel relative z-10 w-full max-w-xl p-6 sm:p-8 animate-fade-in">
         <div className="mb-6 flex items-center justify-between">
           <Link className="flex items-center gap-1 text-sm font-semibold text-accent hover:underline transition" href="/login">
             <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6" /></svg>
@@ -181,8 +182,9 @@ export default function SignUpPage() {
   return (
     <Suspense
       fallback={
-        <main className="rail-gradient flex min-h-dvh items-center justify-center p-4">
-          <section className="rail-panel w-full max-w-xl p-6 sm:p-8">Loading...</section>
+        <main className="rail-gradient relative overflow-hidden flex min-h-dvh items-center justify-center p-4">
+          <div className="rail-dynamic-grid" />
+          <section className="rail-panel relative z-10 w-full max-w-xl p-6 sm:p-8">Loading...</section>
         </main>
       }
     >

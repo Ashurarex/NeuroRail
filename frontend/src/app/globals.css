@@ -128,6 +128,32 @@ input, select, textarea, button {
     linear-gradient(145deg, #090c15 0%, #0d121e 42%, #0f1623 100%);
 }
 
+/* ── dynamic grid background (auth) ────────────────────────────────── */
+.rail-dynamic-grid {
+  position: absolute;
+  inset: -100px;
+  background-size: 60px 60px;
+  background-image: 
+    linear-gradient(to right, rgba(11, 143, 135, 0.07) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(11, 143, 135, 0.07) 1px, transparent 1px);
+  animation: gridPan 20s linear infinite;
+  mask-image: radial-gradient(circle at center, black 30%, transparent 80%);
+  -webkit-mask-image: radial-gradient(circle at center, black 30%, transparent 80%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.dark .rail-dynamic-grid {
+  background-image: 
+    linear-gradient(to right, rgba(20, 184, 166, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(20, 184, 166, 0.05) 1px, transparent 1px);
+}
+
+@keyframes gridPan {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(-60px, -60px); }
+}
+
 /* ── panels ────────────────────────────────────────────────────────── */
 .rail-panel {
   background: var(--panel);

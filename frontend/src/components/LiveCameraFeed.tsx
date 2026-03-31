@@ -19,7 +19,7 @@ import type { DetectResponse } from "@/lib/api/detect-service";
 // ── config ────────────────────────────────────────────────────────────────────
 
 const CAPTURE_W       = 640;
-const CAPTURE_H       = 480;
+const CAPTURE_H       = 360;
 const INFER_INTERVAL_MS = 300;
 
 // ── helpers ───────────────────────────────────────────────────────────────────
@@ -54,7 +54,7 @@ function paintOverlay(
   const scaleY = cssH / CAPTURE_H;
 
   for (const d of detections) {
-    const x = d.bbox.x * scaleX;
+    const x = (CAPTURE_W - (d.bbox.x + d.bbox.w)) * scaleX;
     const y = d.bbox.y * scaleY;
     const w = d.bbox.w * scaleX;
     const h = d.bbox.h * scaleY;
@@ -242,7 +242,7 @@ export default function LiveCameraFeed() {
         autoPlay
         muted
         playsInline
-        className="absolute inset-0 h-full w-full object-cover"
+        className="absolute inset-0 h-full w-full object-contain scale-x-[-1]"
       />
 
       {/* Bounding-box overlay */}
@@ -274,13 +274,13 @@ export default function LiveCameraFeed() {
           {/* LIVE / PAUSED + FPS – top-right */}
           <div className="absolute right-2 top-2 flex items-center gap-1.5">
             {isRunning && fps > 0 && (
-              <span className="rounded-full bg-black/60 px-2 py-0.5 text-[10px] text-slate-300 backdrop-blur-sm">
+              <span className="rounded-full bg-black/30 border border-white/20 px-2 py-0.5 text-[10px] text-white backdrop-blur-md shadow-sm">
                 {fps} fps
               </span>
             )}
             <span
-              className={`flex items-center gap-1 rounded-full px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-white backdrop-blur-sm ${
-                isRunning ? "bg-black/60" : "bg-slate-700/80"
+              className={`flex items-center gap-1 rounded-full border border-white/20 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-white backdrop-blur-md shadow-sm ${
+                isRunning ? "bg-black/30" : "bg-slate-800/40"
               }`}
             >
               {isRunning ? (
@@ -303,7 +303,7 @@ export default function LiveCameraFeed() {
           )}
 
           {/* ── Start / Stop button – bottom bar ─────────────────────────── */}
-          <div className="absolute inset-x-0 bottom-0 flex items-center justify-center gap-2 bg-black/50 backdrop-blur-sm py-1.5">
+          <div className="absolute inset-x-0 bottom-0 flex items-center justify-center gap-2 bg-black/30 border-t border-white/20 backdrop-blur-md shadow-[0_-4px_24px_rgba(0,0,0,0.4)] py-2">
             <button
               id="live-camera-toggle-btn"
               onClick={toggleRunning}

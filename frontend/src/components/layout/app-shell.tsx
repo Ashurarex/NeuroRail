@@ -158,9 +158,9 @@ export default function AppShell({
             <Image
               src="/neurorail-logo.svg"
               alt="NeuroRail logo"
-              width={32}
-              height={32}
-              className="h-8 w-8 transition-transform group-hover:scale-105"
+              width={56}
+              height={56}
+              className="h-14 w-14 transition-transform group-hover:scale-105"
             />
             <div>
               <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-accent leading-none">
@@ -216,9 +216,9 @@ export default function AppShell({
                   <Image
                     src="/neurorail-logo.svg"
                     alt="NeuroRail logo"
-                    width={40}
-                    height={40}
-                    className="h-10 w-10"
+                    width={48}
+                    height={48}
+                    className="h-12 w-12"
                   />
                 </Link>
                 <div>
@@ -299,7 +299,9 @@ export default function AppShell({
 
           {/* ─── Page content ────────────────────────────────────── */}
           <section className="flex-1 space-y-4 overflow-y-auto min-h-0">
-            {children}
+            <div key={pathname} className="animate-fade-in h-full">
+              {children}
+            </div>
           </section>
         </div>
       </div>
