@@ -57,12 +57,46 @@ export type DetectResponse = {
 
 export type LostFoundStatus = "pending" | "matched" | "verified" | "closed";
 
+export type LostFoundMatchStatus = "pending" | "verified" | "rejected";
+
 export type LostFoundCase = {
   id: string;
   status: LostFoundStatus;
   location: string | null;
   image_url: string | null;
+  object_type: string | null;
+  description: string | null;
+  color: string | null;
+  size: string | null;
+  reported_at: string | null;
   user_id: string | null;
   alert_id: string | null;
+  created_at: string;
+};
+
+export type MatchDetection = {
+  id: string;
+  label: string;
+  confidence: number;
+  bbox: Record<string, number> | null;
+  camera_id: string | null;
+  location: string | null;
+  detected_at: string | null;
+  image_url: string | null;
+  snapshot_url: string | null;
+  attributes: Record<string, string | number> | null;
+  frame_width: number | null;
+  frame_height: number | null;
+};
+
+export type LostFoundMatch = {
+  id: string;
+  case_id: string;
+  detection: MatchDetection;
+  confidence: number;
+  image_similarity: number;
+  label_match: number;
+  metadata_score: number;
+  status: LostFoundMatchStatus;
   created_at: string;
 };

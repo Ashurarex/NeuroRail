@@ -51,6 +51,12 @@ class ConnectionManager:
         for ws in dead:
             self.disconnect(ws)
 
+    async def broadcast_batch(self, messages: list[dict[str, Any]]) -> None:
+        if not messages:
+            return
+        for message in messages:
+            await self.broadcast(message)
+
     async def send_personal(self, websocket: WebSocket, message: dict[str, Any]) -> None:
         """Send *message* only to a single connection."""
         try:
@@ -61,3 +67,6 @@ class ConnectionManager:
 
 
 manager = ConnectionManager()
+match_manager = ConnectionManager()
+accuracy_manager = ConnectionManager()
+intel_manager = ConnectionManager()

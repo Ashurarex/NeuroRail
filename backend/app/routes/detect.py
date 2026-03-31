@@ -16,6 +16,7 @@ from app.core.auth import verify_token
 from app.database import get_db
 from app.models import Alert, Detection, User
 from app.services.ml_service import ALERT_THRESHOLD, ml_service
+from app.services.detection_service import queue_detection_processing
 from app.websocket.manager import manager
 
 logger = logging.getLogger(__name__)
@@ -156,6 +157,13 @@ async def detect(
             },
         }
         asyncio.create_task(manager.broadcast(ws_payload))
+
+    await queue_detection_processing(
+        camera_id="manual-upload",
+        location=None,
+        detections=[d.to_dict() for d in detection_items],
+        timestamp=now,
+    )
 
     # ── 6. HTTP response ──────────────────────
     return {

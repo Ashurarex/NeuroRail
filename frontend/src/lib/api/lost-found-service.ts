@@ -1,10 +1,24 @@
 import { apiRequest } from "@/lib/api/client";
 import { getAuthToken } from "@/lib/auth";
-import type { LostFoundCase, LostFoundStatus } from "@/lib/api/types";
+import type {
+  LostFoundCase,
+  LostFoundMatch,
+  LostFoundMatchStatus,
+  LostFoundStatus,
+} from "@/lib/api/types";
+
+export type LostFoundCreatePayload = {
+  file: File;
+  location?: string;
+  objectType?: string;
+  description?: string;
+  color?: string;
+  size?: string;
+  reportedAt?: string;
+};
 
 export async function createLostFoundCase(
-  file: File,
-  location: string,
+  payload: LostFoundCreatePayload,
 ): Promise<LostFoundCase> {
   const token = getAuthToken();
 
@@ -13,14 +27,32 @@ export async function createLostFoundCase(
   }
 
   const formData = new FormData();
-  formData.append("file", file);
-  if (location.trim()) {
-    formData.append("location", location.trim());
+  formData.append("file", payload.file);
+  if (payload.location?.trim()) {
+    formData.append("location", payload.location.trim());
+  }
+  if (payload.objectType?.trim()) {
+    formData.append("object_type", payload.objectType.trim());
+  }
+  if (payload.description?.trim()) {
+    formData.append("description", payload.description.trim());
+  }
+  if (payload.color?.trim()) {
+    formData.append("color", payload.color.trim());
+  }
+  if (payload.size?.trim()) {
+    formData.append("size", payload.size.trim());
+  }
+  if (payload.reportedAt?.trim()) {
+    formData.append("reported_at", payload.reportedAt.trim());
   }
 
   try {
-    console.log("Submitting lost & found case:", { file: file.name, location });
-    const result = await apiRequest<LostFoundCase>("/lost-found", {
+    console.log("Submitting lost & found case:", {
+      file: payload.file.name,
+      location: payload.location,
+    });
+    const result = await apiRequest<LostFoundCase>("/lost-item", {
       method: "POST",
       body: formData,
       token,
@@ -83,4 +115,35 @@ export async function updateLostFoundStatus(
     token,
     body: JSON.stringify({ status }),
   });
+}
+
+export async function fetchLostFoundMatches(caseId: string): Promise<LostFoundMatch[]> {
+  const token = getAuthToken();
+  if (!token) {
+    throw new Error("Please login again as admin.");
+  }
+
+  return apiRequest<LostFoundMatch[]>(`/matches/${caseId}`, {
+    method: "GET",
+    token,
+  });
+}
+
+export async function updateLostFoundMatchStatus(
+  matchId: string,
+  status: LostFoundMatchStatus,
+  matchNotes?: string,
+): Promise<LostFoundMatch> {
+  const token = getAuthToken();
+  if (!token) {
+    throw new Error("Please login again as admin.");
+  }
+
+  return apiRequest<LostFoundMatch>(`/matches/match/${matchId}`,
+    {
+      method: "PATCH",
+      token,
+      body: JSON.stringify({ status, match_notes: matchNotes ?? null }),
+    },
+  );
 }

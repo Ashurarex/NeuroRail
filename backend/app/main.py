@@ -1,12 +1,16 @@
-from contextlib import asynccontextmanager
+import asyncio
+from contextlib import asynccontextmanager, suppress
+from pathlib import Path
 import logging
 
 from fastapi import Depends, FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.auth import verify_token
-from app.database import Base, engine, get_db
+from app.core.auth import verify_admin_token, verify_token
+from app.database import AsyncSessionLocal, Base, engine, get_db
+from app.services.accuracy_service import accuracy_broadcast_loop
 from app.services.ml_service import ml_service  # initialised at import time
 
 logger = logging.getLogger(__name__)
@@ -18,11 +22,13 @@ from app.routes import (
     detect_router,
     detections_router,
     lost_found_router,
+    lost_item_router,
+    matches_router,
     predictions_router,
     reports_router,
     users_router,
 )
-from app.websocket.manager import manager
+from app.websocket.manager import accuracy_manager, intel_manager, manager, match_manager
 
 
 @asynccontextmanager
@@ -35,7 +41,11 @@ async def lifespan(_: FastAPI):
         ml_service.model_type,
         ml_service.model_path,
     )
+    accuracy_task = asyncio.create_task(accuracy_broadcast_loop(accuracy_manager))
     yield
+    accuracy_task.cancel()
+    with suppress(asyncio.CancelledError):
+        await accuracy_task
 
 app = FastAPI(
     title="NeuroRail Backend",
@@ -43,6 +53,9 @@ app = FastAPI(
     version="1.0.0",
     lifespan=lifespan,
 )
+
+UPLOADS_DIR = Path(__file__).resolve().parents[1] / "uploads"
+app.mount("/uploads", StaticFiles(directory=str(UPLOADS_DIR)), name="uploads")
 
 
 # -------------------------
@@ -148,6 +161,60 @@ async def alerts_websocket(websocket: WebSocket):
         manager.disconnect(websocket)
 
 
+@app.websocket("/ws/lost-found-matches")
+async def lost_found_matches_websocket(websocket: WebSocket):
+    await match_manager.connect(websocket)
+    try:
+        while True:
+            await websocket.receive_text()
+    except WebSocketDisconnect:
+        match_manager.disconnect(websocket)
+
+
+@app.websocket("/ws/accuracy")
+async def accuracy_websocket(websocket: WebSocket):
+    token = websocket.query_params.get("token")
+    if not token:
+        await websocket.close(code=1008)
+        return
+
+    async with AsyncSessionLocal() as db:
+        try:
+            await verify_admin_token(token, db)
+        except Exception:
+            await websocket.close(code=1008)
+            return
+
+    await accuracy_manager.connect(websocket)
+    try:
+        while True:
+            await websocket.receive_text()
+    except WebSocketDisconnect:
+        accuracy_manager.disconnect(websocket)
+
+
+@app.websocket("/ws/intel")
+async def intel_websocket(websocket: WebSocket):
+    token = websocket.query_params.get("token")
+    if not token:
+        await websocket.close(code=1008)
+        return
+
+    async with AsyncSessionLocal() as db:
+        try:
+            await verify_admin_token(token, db)
+        except Exception:
+            await websocket.close(code=1008)
+            return
+
+    await intel_manager.connect(websocket)
+    try:
+        while True:
+            await websocket.receive_text()
+    except WebSocketDisconnect:
+        intel_manager.disconnect(websocket)
+
+
 # -------------------------
 # 📡 ROUTERS
 # -------------------------
@@ -160,6 +227,8 @@ app.include_router(users_router)
 app.include_router(detections_router)
 app.include_router(predictions_router)
 app.include_router(lost_found_router)
+app.include_router(lost_item_router)
+app.include_router(matches_router)
 
 
 # (duplicate /health removed – the async version above is canonical)

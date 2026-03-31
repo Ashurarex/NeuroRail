@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import Column, DateTime, ForeignKey, String, Text
+from sqlalchemy import Column, DateTime, ForeignKey, JSON, String, Text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
@@ -15,6 +15,12 @@ class LostFound(Base):
     status = Column(String(50), nullable=False, default="pending")
     location = Column(Text, nullable=True)
     image_url = Column(Text, nullable=True)
+    object_type = Column(String(120), nullable=True)
+    description = Column(Text, nullable=True)
+    color = Column(String(80), nullable=True)
+    size = Column(String(80), nullable=True)
+    reported_at = Column(DateTime, default=datetime.utcnow, nullable=False, index=True)
+    image_embedding = Column(JSON, nullable=True)
     user_id = Column(
         UUID(as_uuid=True),
         ForeignKey("users.id", ondelete="SET NULL"),
@@ -31,3 +37,4 @@ class LostFound(Base):
 
     user = relationship("User", back_populates="lost_found_cases")
     alert = relationship("Alert")
+    matches = relationship("LostFoundMatch", back_populates="case", cascade="all, delete-orphan")

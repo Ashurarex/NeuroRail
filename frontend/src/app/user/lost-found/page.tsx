@@ -10,6 +10,11 @@ import type { LostFoundCase } from "@/lib/api/types";
 
 export default function UserLostFoundPage() {
   const [location, setLocation] = useState("");
+  const [objectType, setObjectType] = useState("");
+  const [description, setDescription] = useState("");
+  const [color, setColor] = useState("");
+  const [size, setSize] = useState("");
+  const [reportedAt, setReportedAt] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -86,12 +91,25 @@ export default function UserLostFoundPage() {
     setNotice(null);
 
     try {
-      const response = await createLostFoundCase(selectedFile, location);
+      const response = await createLostFoundCase({
+        file: selectedFile,
+        location,
+        objectType,
+        description,
+        color,
+        size,
+        reportedAt,
+      });
       const locationSuffix = location.trim() ? ` at ${location.trim()}` : "";
       setNotice(`Submitted${locationSuffix}. Case ${response.id.slice(0, 8)} created.`);
       setCases((prev) => [response, ...prev]);
       setSelectedFile(null);
       setLocation("");
+      setObjectType("");
+      setDescription("");
+      setColor("");
+      setSize("");
+      setReportedAt("");
       // Clear file input display
       const fileInput = document.getElementById("item-image") as HTMLInputElement;
       if (fileInput) {
@@ -137,6 +155,77 @@ export default function UserLostFoundPage() {
               setSelectedFile(file);
             }}
             required
+          />
+        </div>
+
+        <div className="grid gap-2">
+          <label htmlFor="object-type" className="text-sm font-medium">
+            Object type
+          </label>
+          <input
+            id="object-type"
+            type="text"
+            className="h-11 rounded-lg border border-line bg-surface px-3"
+            placeholder="Backpack, suitcase, phone"
+            value={objectType}
+            onChange={(event) => setObjectType(event.target.value)}
+            required
+          />
+        </div>
+
+        <div className="grid gap-2">
+          <label htmlFor="description" className="text-sm font-medium">
+            Description
+          </label>
+          <textarea
+            id="description"
+            className="min-h-24 rounded-lg border border-line bg-surface px-3 py-2"
+            placeholder="Brand, stickers, unique marks, or any extra details"
+            value={description}
+            onChange={(event) => setDescription(event.target.value)}
+            required
+          />
+        </div>
+
+        <div className="grid gap-2 sm:grid-cols-2">
+          <div className="grid gap-2">
+            <label htmlFor="color" className="text-sm font-medium">
+              Dominant color (optional)
+            </label>
+            <input
+              id="color"
+              type="text"
+              className="h-11 rounded-lg border border-line bg-surface px-3"
+              placeholder="Black, red, navy"
+              value={color}
+              onChange={(event) => setColor(event.target.value)}
+            />
+          </div>
+          <div className="grid gap-2">
+            <label htmlFor="size" className="text-sm font-medium">
+              Size (optional)
+            </label>
+            <input
+              id="size"
+              type="text"
+              className="h-11 rounded-lg border border-line bg-surface px-3"
+              placeholder="Small, medium, large"
+              value={size}
+              onChange={(event) => setSize(event.target.value)}
+            />
+          </div>
+        </div>
+
+        <div className="grid gap-2">
+          <label htmlFor="reported-at" className="text-sm font-medium">
+            Time last seen
+          </label>
+          <input
+            id="reported-at"
+            type="datetime-local"
+            className="h-11 rounded-lg border border-line bg-surface px-3"
+            value={reportedAt}
+            onChange={(event) => setReportedAt(event.target.value)}
           />
         </div>
 
@@ -196,6 +285,7 @@ export default function UserLostFoundPage() {
             <thead>
               <tr className="border-b border-line">
                 <th className="py-3 px-2 font-semibold text-muted">Case ID</th>
+                <th className="py-3 px-2 font-semibold text-muted">Object</th>
                 <th className="py-3 px-2 font-semibold text-muted">Location</th>
                 <th className="py-3 px-2 font-semibold text-muted">Status</th>
                 <th className="py-3 px-2 font-semibold text-muted">Submitted</th>
@@ -204,14 +294,14 @@ export default function UserLostFoundPage() {
             <tbody>
               {loadingCases ? (
                 <tr>
-                  <td className="py-4 px-2 text-muted" colSpan={4}>
+                  <td className="py-4 px-2 text-muted" colSpan={5}>
                     Loading cases...
                   </td>
                 </tr>
               ) : null}
               {!loadingCases && filteredCases.length === 0 ? (
                 <tr>
-                  <td className="py-4 px-2 text-muted" colSpan={4}>
+                  <td className="py-4 px-2 text-muted" colSpan={5}>
                     No cases found.
                   </td>
                 </tr>
@@ -220,6 +310,7 @@ export default function UserLostFoundPage() {
                 ? filteredCases.map((item) => (
                   <tr key={item.id} className="border-b border-line/50 hover:bg-amber-50/30 transition">
                     <td className="py-3 px-2 font-mono text-xs">{item.id.slice(0, 12)}...</td>
+                    <td className="py-3 px-2">{item.object_type ?? "-"}</td>
                     <td className="py-3 px-2">{item.location ?? "-"}</td>
                     <td className="py-3 px-2">
                       <span className="inline-block rounded-full px-2 py-1 text-xs font-semibold bg-amber-100 text-amber-700 capitalize">

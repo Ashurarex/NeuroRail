@@ -8,6 +8,11 @@ class LostFoundBase(BaseModel):
     status: str = "pending"
     location: str | None = None
     image_url: str | None = None
+    object_type: str | None = None
+    description: str | None = None
+    color: str | None = None
+    size: str | None = None
+    reported_at: datetime | None = None
     user_id: UUID | None = None
     alert_id: UUID | None = None
 
