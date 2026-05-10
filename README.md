@@ -187,7 +187,7 @@ Then open: `http://localhost:3000`
 
 ### Lost & Found Workflow
 
-```mermaid
+mermaid
 flowchart TD
     U[User submits case<br/>POST /lost-item or /lost-found] --> C[Case saved + image embedding]
     I[Surveillance ingestion<br/>POST /detections/ingest] --> M[Matching service scores candidates]
@@ -195,17 +195,16 @@ flowchart TD
     M --> R[Match records created]
     R --> A[Admin reviews /matches/{case_id}]
     A --> V[PATCH /matches/match/{match_id}<br/>verify/reject]
-```
+
 
 ### Auth + Role Routing
 
-```mermaid
+mermaid
 flowchart LR
     L[Login / Signup] --> T[JWT + role cookie]
     T --> U1[/user/* routes allowed for role=user/]
     T --> A1[/admin/* routes allowed for role=admin/]
     T --> W[Admin WebSockets use token query param]
-```
 
 ## Troubleshooting
 
